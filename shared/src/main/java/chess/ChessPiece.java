@@ -97,19 +97,18 @@ public class ChessPiece {
         if (piece.getPieceType() == PieceType.BISHOP) {
             int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
             for (int k = 0; k < 4; k++) {
-                while (i < 8 && j < 8 && i > 1 && j > 1) {
+                while (true) {
                     i+= directions[k][0];
                     j+= directions[k][1];
                     ChessPosition position = new ChessPosition(i, j);
-                    if (board.getPiece(position) != null) {
-                        if (board.getPiece(position).getTeamColor() != piece.getTeamColor()) {
-                            ChessMove move = new ChessMove(myPosition, position, null);
-                            moves.add(move);
-                        }
+                    if(!ValidMove(board, position, piece)) {
                         break;
                     }
                     ChessMove move = new ChessMove(myPosition, position, null);
                     moves.add(move);
+                    if(board.getPiece(position) != null){
+                        break;
+                    }
                 }
                 i = myPosition.getRow();
                 j = myPosition.getColumn();
@@ -220,19 +219,38 @@ public class ChessPiece {
         if(piece.getPieceType() == PieceType.ROOK){
             int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
             for (int k = 0; k < 4; k++) {
-                while (i < 8 && j < 8 && i > 1 && j > 1) {
+                while (true) {
                     i+= directions[k][0];
                     j+= directions[k][1];
                     ChessPosition position = new ChessPosition(i, j);
-                    if (board.getPiece(position) != null) {
-                        if (board.getPiece(position).getTeamColor() != piece.getTeamColor()) {
-                            ChessMove move = new ChessMove(myPosition, position, null);
-                            moves.add(move);
-                        }
+                    if(!ValidMove(board, position, piece)) {
                         break;
                     }
                     ChessMove move = new ChessMove(myPosition, position, null);
                     moves.add(move);
+                    if(board.getPiece(position) != null){
+                        break;
+                    }
+                }
+                i = myPosition.getRow();
+                j = myPosition.getColumn();
+            }
+        }
+        if(piece.getPieceType() == PieceType.QUEEN){
+            int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0},{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+            for (int k = 0; k < 8; k++) {
+                while (true) {
+                    i+= directions[k][0];
+                    j+= directions[k][1];
+                    ChessPosition position = new ChessPosition(i, j);
+                    if(!ValidMove(board, position, piece)) {
+                        break;
+                    }
+                    ChessMove move = new ChessMove(myPosition, position, null);
+                    moves.add(move);
+                    if(board.getPiece(position) != null){
+                        break;
+                    }
                 }
                 i = myPosition.getRow();
                 j = myPosition.getColumn();
