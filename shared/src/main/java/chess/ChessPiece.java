@@ -67,6 +67,16 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
+    public boolean ValidMove(ChessBoard board, ChessPosition newPosition, ChessPiece piece){
+        if (newPosition.getRow() > 0 && newPosition.getRow() < 9 && newPosition.getColumn() > 0 && newPosition.getColumn() < 9) {
+            if (board.getPiece(newPosition) != null) {
+                return board.getPiece(newPosition).getTeamColor() != piece.getTeamColor();
+            }
+            return true;
+        }
+        return false;
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         Collection<ChessMove> moves = new ArrayList<>();
@@ -134,6 +144,16 @@ public class ChessPiece {
                 moves.add(move);
                 i--;
                 j--;
+            }
+        }
+        if (piece.getPieceType() == PieceType.KING){
+            int[][] attempts = {{1,0},{1,1}, {0,1}, {-1,1},{-1,0},{-1,-1},{0,-1},{1,-1}};
+            for(int k = 0; k < 8; k++) {
+                ChessPosition position = new ChessPosition(i + attempts[k][0], j + attempts[k][1]);
+                if (ValidMove(board, position, piece)) {
+                    ChessMove move = new ChessMove(myPosition, position, null);
+                    moves.add(move);
+                }
             }
         }
         return moves;
