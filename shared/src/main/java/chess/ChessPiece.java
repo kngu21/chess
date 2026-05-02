@@ -156,6 +156,16 @@ public class ChessPiece {
                 }
             }
         }
+        if (piece.getPieceType() == PieceType.KNIGHT){
+            int[][] attempts = {{2,1},{1,2}, {2,-1}, {-1,2},{-2,1},{1,-2},{-1,-2},{-2,-1}};
+            for(int k = 0; k < 8; k++) {
+                ChessPosition position = new ChessPosition(i + attempts[k][0], j + attempts[k][1]);
+                if (ValidMove(board, position, piece)) {
+                    ChessMove move = new ChessMove(myPosition, position, null);
+                    moves.add(move);
+                }
+            }
+        }
         return moves;
     }
 }
