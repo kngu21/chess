@@ -217,6 +217,27 @@ public class ChessPiece {
                 }
             }
         }
+        if(piece.getPieceType() == PieceType.ROOK){
+            int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            for (int k = 0; k < 4; k++) {
+                while (i < 8 && j < 8 && i > 1 && j > 1) {
+                    i+= directions[k][0];
+                    j+= directions[k][1];
+                    ChessPosition position = new ChessPosition(i, j);
+                    if (board.getPiece(position) != null) {
+                        if (board.getPiece(position).getTeamColor() != piece.getTeamColor()) {
+                            ChessMove move = new ChessMove(myPosition, position, null);
+                            moves.add(move);
+                        }
+                        break;
+                    }
+                    ChessMove move = new ChessMove(myPosition, position, null);
+                    moves.add(move);
+                }
+                i = myPosition.getRow();
+                j = myPosition.getColumn();
+            }
+        }
         return moves;
     }
 }
