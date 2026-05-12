@@ -9,9 +9,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
-
-    private final ChessPosition startPosition;
-    private final ChessPosition endPosition;
+    private final ChessPosition start;
+    private final ChessPosition end;
+    private final ChessPiece.PieceType promo;
 
     @Override
     public boolean equals(Object o) {
@@ -19,35 +19,33 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+        return Objects.equals(start, chessMove.start) && Objects.equals(end, chessMove.end) && promo == chessMove.promo;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startPosition, endPosition, promotionPiece);
+        return Objects.hash(start, end, promo);
     }
-
-    private final ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
-        this.promotionPiece = promotionPiece;
+        this.start = startPosition;
+        this.end = endPosition;
+        this.promo = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        return startPosition;
+        return start;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return endPosition;
+        return end;
     }
 
     /**
@@ -57,12 +55,9 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return promotionPiece;
+        return promo;
     }
-
-    @Override
-    public String toString() {
-        return startPosition.toString() +
-                endPosition.toString();
+    public String toString(){
+        return start.toString() + end.toString();
     }
 }

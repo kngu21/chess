@@ -10,24 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(the_battleground, that.the_battleground);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(the_battleground);
-    }
-
-    ChessPiece[][] the_battleground = new ChessPiece[8][8];
+    ChessPiece [][] battleground = new ChessPiece [8][8];
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -37,8 +22,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        the_battleground[position.getRow() - 1][position.getColumn() - 1] = piece;
+        battleground[position.getRow()-1][position.getColumn()-1] = piece;
     }
+
     /**
      * Gets a chess piece on the chessboard
      *
@@ -47,7 +33,21 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return the_battleground[position.getRow() - 1][position.getColumn() - 1];
+        return battleground[position.getRow()-1][position.getColumn()-1];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(battleground, that.battleground);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(battleground);
     }
 
     /**
@@ -57,10 +57,10 @@ public class ChessBoard {
     public void resetBoard() {
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
-                addPiece(new ChessPosition(i, j), null);
+                addPiece(new ChessPosition(i,j), null);
             }
         }
-        for(int i = 1; i < 9; i++) {
+        for(int i = 1; i < 9; i++){
             addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         }
         addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
@@ -72,7 +72,8 @@ public class ChessBoard {
         addPiece(new ChessPosition(1, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
         addPiece(new ChessPosition(1, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
 
-        for(int i = 1; i < 9; i++) {
+
+        for(int i = 1; i < 9; i++){
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
         addPiece(new ChessPosition(8, 1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
