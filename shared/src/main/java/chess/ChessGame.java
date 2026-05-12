@@ -11,8 +11,10 @@ import java.util.ArrayList;
  */
 public class ChessGame {
     private int turn;
+    private ChessBoard myBoard;
     public ChessGame() {
         this.turn = 0;
+        this.myBoard = new ChessBoard();
     }
 
     /**
@@ -114,7 +116,12 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                ChessPosition current = new ChessPosition(i,j);
+                myBoard.addPiece(current, board.getPiece(current));
+            }
+        }
     }
 
     /**
@@ -123,6 +130,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return myBoard;
     }
 }
