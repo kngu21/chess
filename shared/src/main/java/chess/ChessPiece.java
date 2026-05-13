@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+    private int counter;
 
     @Override
     public boolean equals(Object o) {
@@ -31,6 +32,7 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.counter = 0;
     }
 
     /**
@@ -57,6 +59,14 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return type;
+    }
+
+    public void move(){
+        counter += 1;
+    }
+
+    public int getCounter(){
+        return counter;
     }
 
     /**
