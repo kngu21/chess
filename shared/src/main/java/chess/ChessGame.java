@@ -67,6 +67,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        var copy = new ChessBoard(myBoard);
         ChessPiece current = myBoard.getPiece(startPosition);
         Collection<ChessMove> finals = new ArrayList<>();
         if(current != null) {
@@ -89,8 +90,11 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         boolean isValid = false;
-        ChessBoard tester = getBoard();
+        ChessBoard tester = new ChessBoard(myBoard);
         ChessPiece piece = tester.getPiece(move.getStartPosition());
+        if(piece == null) {
+            throw new InvalidMoveException("Piece is null.");
+        }
         TeamColor color = piece.getTeamColor();
         if(color != getTeamTurn()){
             throw new InvalidMoveException("Wrong team's turn.");
@@ -161,14 +165,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        ChessBoard tester = new ChessBoard(myBoard);
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
                 ChessPosition current = new ChessPosition(i,j);
-                ChessPiece piece = myBoard.getPiece(current);
+                ChessPiece piece = tester.getPiece(current);
                 if(piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(myBoard, current);
+                    Collection<ChessMove> moves = piece.pieceMoves(tester, current);
                     if(moves != null) {
                         for (ChessMove move : moves) {
+
                             if(!isInCheck(teamColor)){
                                 return false;
                             }

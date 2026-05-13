@@ -14,6 +14,20 @@ public class ChessBoard {
     public ChessBoard() {
 
     }
+    public ChessBoard(ChessBoard original){
+        ChessPiece [][] boardCopy = new ChessPiece[8][8];
+        for(int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = original.battleground[i][j];
+                if(piece != null){
+                    boardCopy[i][j] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                }
+                else{
+                    boardCopy[i][j] = null;
+                }
+            }
+        }
+    }
 
     /**
      * Adds a chess piece to the chessboard
