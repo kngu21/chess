@@ -1,16 +1,26 @@
 package Service;
-import java.util.ArrayList;
+import Handlers.RegisterHandler;
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
+import model.AuthData;
+import model.UserData;
 
 public class UserService {
-    private final ArrayList<String> request;
-    public UserService(ArrayList<String> request){
-        this.request = request;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    public UserService(UserDAO userDAO, AuthDAO authDAO){
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
     }
-    public record RegisterResult(String username, String password, String email){
-
-    }
-    public String getResult(String request){
-        String result = new String();
-        return result;
+    public RegisterHandler.RegisterResult register(UserData request) throws AlreadyTakenException {
+        UserData exists = userDAO.getUser(request.username());
+        if(exists != null){
+            throw new AlreadyTakenException("Username already taken");
+        }
+        UserData newUser = new UserData(request.username(), request.password(), request.email());
+        userDAO.createUser(newUser);
+        AuthData newAuth = new AuthData(request.password(), request.username());
+        AuthData newData = authDAO.createAuth(newAuth);
+        return new RegisterHandler.RegisterResult(request.username(), newData.authToken());
     }
 }

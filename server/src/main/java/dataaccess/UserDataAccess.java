@@ -5,10 +5,8 @@ import java.util.HashMap;
 
 public class UserDataAccess implements UserDAO{
     private final HashMap<String, UserData> data;
-    private final HashMap<String, AuthData> authTokens;
-    public UserDataAccess(HashMap<String, UserData> data, HashMap<String, AuthData> authTokens){
+    public UserDataAccess(HashMap<String, UserData> data){
         this.data = data;
-        this.authTokens = authTokens;
     }
     public UserData getUser(String username){
         return data.get(username);
@@ -21,6 +19,5 @@ public class UserDataAccess implements UserDAO{
     @Override
     public void clear() {
         data.clear();
-        authTokens.clear();
     }
 }
