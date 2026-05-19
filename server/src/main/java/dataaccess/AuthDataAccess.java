@@ -4,9 +4,9 @@ import java.util.UUID;
 import java.util.HashMap;
 
 public class AuthDataAccess implements AuthDAO{
-    private final HashMap<String, AuthData> authTokens;
-    public AuthDataAccess(HashMap<String, AuthData> authTokens){
-        this.authTokens = authTokens;
+    private HashMap<String, AuthData> authTokens;
+    public AuthDataAccess(){
+        this.authTokens = new HashMap<>();
     }
     public AuthData createAuth(String username){
         String newUUID = UUID.randomUUID().toString();
@@ -15,10 +15,10 @@ public class AuthDataAccess implements AuthDAO{
         return newAuth;
     }
 
-    @Override
-    public AuthData createAuth(AuthData authData) {
-        return null;
+    public AuthData getAuth(String username){
+        return authTokens.get(username);
     }
+
     public void clear(){
         authTokens.clear();
     }

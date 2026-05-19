@@ -20,7 +20,7 @@ public class UserService {
         UserData newUser = new UserData(request.username(), request.password(), request.email());
         userDAO.createUser(newUser);
         AuthData newAuth = new AuthData(request.password(), request.username());
-        AuthData newData = authDAO.createAuth(newAuth);
+        AuthData newData = authDAO.createAuth(request.username());
         return new RegisterHandler.RegisterResult(request.username(), newData.authToken());
     }
 }
