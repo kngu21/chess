@@ -4,11 +4,7 @@ import dataaccess.AuthDataAccess;
 import dataaccess.UserDAO;
 import dataaccess.UserDataAccess;
 import model.UserData;
-import model.AuthData;
 import org.junit.jupiter.api.Test;
-import Service.AlreadyTakenException;
-
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
