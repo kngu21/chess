@@ -2,7 +2,6 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 import java.util.HashMap;
-import static java.util.UUID.randomUUID;
 
 public class UserDataAccess implements UserDAO{
     private final HashMap<String, UserData> data;
@@ -17,12 +16,6 @@ public class UserDataAccess implements UserDAO{
 
     public void createUser(UserData userData) {
         data.put(userData.username(), userData);
-    }
-
-    public AuthData createAuth(String username) {
-        AuthData newAuth = new AuthData(username, randomUUID().toString());
-        authTokens.put(username, newAuth);
-        return newAuth;
     }
 
     @Override

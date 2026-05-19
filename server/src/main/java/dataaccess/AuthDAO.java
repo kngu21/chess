@@ -1,4 +1,7 @@
 package dataaccess;
 
-public class AuthDAO {
+import model.AuthData;
+
+public interface AuthDAO {
+    void createAuth(AuthData authData);
 }
