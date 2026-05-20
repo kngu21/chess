@@ -172,7 +172,8 @@ public class ChessGame {
         for(int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition current = new ChessPosition(i,j);
-                if(board.getPiece(current) != null && board.getPiece(current).getTeamColor().equals(color) && board.getPiece(current).getPieceType().equals(ChessPiece.PieceType.KING)){
+                ChessPiece currentPiece = board.getPiece(current);
+                if(currentPiece != null && currentPiece.getTeamColor().equals(color) && currentPiece.getPieceType().equals(ChessPiece.PieceType.KING)){
                     return current;
                 }
             }

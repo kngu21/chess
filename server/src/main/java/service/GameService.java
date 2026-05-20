@@ -20,7 +20,7 @@ public class GameService {
             throw new UnauthorizedException("Unauthorized");
         }
         GameData data = gameDAO.createGame(gameName);
-        return new CreateGameHandler.CreateGameResult(data.GameID(), data.whiteUsername(), data.blackUsername(), gameName);
+        return new CreateGameHandler.CreateGameResult(data.gameID(), data.whiteUsername(), data.blackUsername(), gameName);
     }
 
     public void joinGame(String authToken, String playerColor, int gameID) throws AlreadyTakenException {

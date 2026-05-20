@@ -192,21 +192,25 @@ public class ChessPiece {
                     }
                 }
                 ChessPosition leftCapture = new ChessPosition(i+1, j-1);
-                if(onBoard(leftCapture) && board.getPiece(leftCapture) != null && board.getPiece(leftCapture).getTeamColor() != piece.getTeamColor()){
-                    if(i+1 == 8){
-                        promotePawn(moves, myPosition, leftCapture);
-                    }
-                    else {
-                        moves.add(new ChessMove(myPosition, leftCapture, null));
+                if(onBoard(leftCapture)) {
+                    ChessPiece currentPiece = board.getPiece(leftCapture);
+                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
+                        if (i + 1 == 8) {
+                            promotePawn(moves, myPosition, leftCapture);
+                        } else {
+                            moves.add(new ChessMove(myPosition, leftCapture, null));
+                        }
                     }
                 }
                 ChessPosition rightCapture = new ChessPosition(i+1, j+1);
-                if(onBoard(rightCapture) && board.getPiece(rightCapture) != null && board.getPiece(rightCapture).getTeamColor() != piece.getTeamColor()){
-                    if(i+1 == 8){
-                        promotePawn(moves, myPosition, rightCapture);
-                    }
-                    else {
-                        moves.add(new ChessMove(myPosition, rightCapture, null));
+                if(onBoard(rightCapture)) {
+                    ChessPiece currentPiece = board.getPiece(rightCapture);
+                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
+                        if (i + 1 == 8) {
+                            promotePawn(moves, myPosition, rightCapture);
+                        } else {
+                            moves.add(new ChessMove(myPosition, rightCapture, null));
+                        }
                     }
                 }
             }
@@ -228,21 +232,25 @@ public class ChessPiece {
                     }
                 }
                 ChessPosition leftCapture = new ChessPosition(i-1, j+1);
-                if(onBoard(leftCapture) && board.getPiece(leftCapture) != null && board.getPiece(leftCapture).getTeamColor() != piece.getTeamColor()){
-                    if(i-1 == 1){
-                        promotePawn(moves, myPosition, leftCapture);
-                    }
-                    else {
-                        moves.add(new ChessMove(myPosition, leftCapture, null));
+                if(onBoard(leftCapture)) {
+                    ChessPiece currentPiece = board.getPiece(leftCapture);
+                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
+                        if (i - 1 == 1) {
+                            promotePawn(moves, myPosition, leftCapture);
+                        } else {
+                            moves.add(new ChessMove(myPosition, leftCapture, null));
+                        }
                     }
                 }
                 ChessPosition rightCapture = new ChessPosition(i-1, j-1);
-                if(onBoard(rightCapture) && board.getPiece(rightCapture) != null && board.getPiece(rightCapture).getTeamColor() != piece.getTeamColor()){
-                    if(i-1 == 1){
-                        promotePawn(moves, myPosition, rightCapture);
-                    }
-                    else {
-                        moves.add(new ChessMove(myPosition, rightCapture, null));
+                if(onBoard(rightCapture)) {
+                    ChessPiece currentPiece = board.getPiece(rightCapture);
+                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
+                        if (i - 1 == 1) {
+                            promotePawn(moves, myPosition, rightCapture);
+                        } else {
+                            moves.add(new ChessMove(myPosition, rightCapture, null));
+                        }
                     }
                 }
             }

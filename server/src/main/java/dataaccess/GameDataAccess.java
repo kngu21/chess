@@ -6,15 +6,15 @@ import java.util.HashMap;
 
 public class GameDataAccess implements GameDAO{
     private final HashMap<Integer, GameData> games;
-    private int GameID;
+    private int gameID;
     public GameDataAccess(){
         this.games = new HashMap<>();
-        this.GameID = 1;
+        this.gameID = 1;
     }
     public GameData createGame(String gameName){
         ChessGame game = new ChessGame();
-        GameData newGame = new GameData(GameID++, null, null, gameName, game);
-        games.put(newGame.GameID(), newGame);
+        GameData newGame = new GameData(gameID++, null, null, gameName, game);
+        games.put(newGame.gameID(), newGame);
         return newGame;
     }
 
@@ -23,8 +23,8 @@ public class GameDataAccess implements GameDAO{
     }
 
     public void replaceGame(GameData newGame){
-        GameData original = games.get(newGame.GameID());
-        games.put(original.GameID(), newGame);
+        GameData original = games.get(newGame.gameID());
+        games.put(original.gameID(), newGame);
     }
 
     public ArrayList<GameData> listGames(){

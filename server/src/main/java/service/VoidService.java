@@ -32,7 +32,7 @@ public class VoidService {
         ArrayList<GameData> list = gameDAO.listGames();
         ArrayList<GameInfo> newList = new ArrayList<>();
         for(GameData g : list){
-            newList.add(new GameInfo(g.GameID(), g.whiteUsername(), g.blackUsername(), g.gameName()));
+            newList.add(new GameInfo(g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName()));
         }
         return newList;
     }
