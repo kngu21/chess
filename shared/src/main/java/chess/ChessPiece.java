@@ -13,8 +13,6 @@ import java.util.ArrayList;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
-    private int counter;
-    private boolean doubleMove;
 
     @Override
     public boolean equals(Object o) {
@@ -33,7 +31,6 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-        this.doubleMove = false;
     }
 
     /**
@@ -61,10 +58,6 @@ public class ChessPiece {
     public PieceType getPieceType() {
         return type;
     }
-
-
-
-
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -148,86 +141,53 @@ public class ChessPiece {
         if(type == PieceType.PAWN){
             if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
                 ChessPosition oneAhead = new ChessPosition(i+1, j);
-                if(board.getPiece(oneAhead) == null){
-                    if(i+1 == 3){
-                        moves.add(new ChessMove(myPosition, oneAhead, null));
-                        ChessPosition twoAhead = new ChessPosition(i+2, j);
-                        if(board.getPiece(twoAhead) == null){
-                            moves.add(new ChessMove(myPosition, twoAhead, null));
-                        }
-                    }
-                    else if( i+1 == 8){
-                        promotePawn(moves, myPosition, oneAhead);
-                    }
-                    else{
-                        moves.add(new ChessMove(myPosition, oneAhead, null));
-                    }
-                }
+                aheadMoves(board,oneAhead,moves,i,j, 1, 3, 8, myPosition);
                 ChessPosition leftCapture = new ChessPosition(i+1, j-1);
-                if(onBoard(leftCapture)) {
-                    ChessPiece currentPiece = board.getPiece(leftCapture);
-                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
-                        if (i + 1 == 8) {
-                            promotePawn(moves, myPosition, leftCapture);
-                        } else {
-                            moves.add(new ChessMove(myPosition, leftCapture, null));
-                        }
-                    }
-                }
+                captureMoves(board, leftCapture, myPosition, piece, moves, i,1, 8);
                 ChessPosition rightCapture = new ChessPosition(i+1, j+1);
-                if(onBoard(rightCapture)) {
-                    ChessPiece currentPiece = board.getPiece(rightCapture);
-                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
-                        if (i + 1 == 8) {
-                            promotePawn(moves, myPosition, rightCapture);
-                        } else {
-                            moves.add(new ChessMove(myPosition, rightCapture, null));
-                        }
-                    }
-                }
+                captureMoves(board, rightCapture, myPosition, piece, moves, i,1, 8);
             }
             else{
                 ChessPosition oneAhead = new ChessPosition(i-1, j);
-                if(board.getPiece(oneAhead) == null){
-                    if(i-1 == 6){
-                        moves.add(new ChessMove(myPosition, oneAhead, null));
-                        ChessPosition twoAhead = new ChessPosition(i-2, j);
-                        if(board.getPiece(twoAhead) == null){
-                            moves.add(new ChessMove(myPosition, twoAhead, null));
-                        }
-                    }
-                    else if( i-1 == 1){
-                        promotePawn(moves, myPosition, oneAhead);
-                    }
-                    else{
-                        moves.add(new ChessMove(myPosition, oneAhead, null));
-                    }
-                }
+                aheadMoves(board,oneAhead,moves,i,j, -1, 6, 1, myPosition);
                 ChessPosition leftCapture = new ChessPosition(i-1, j+1);
-                if(onBoard(leftCapture)) {
-                    ChessPiece currentPiece = board.getPiece(leftCapture);
-                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
-                        if (i - 1 == 1) {
-                            promotePawn(moves, myPosition, leftCapture);
-                        } else {
-                            moves.add(new ChessMove(myPosition, leftCapture, null));
-                        }
-                    }
-                }
+                captureMoves(board, leftCapture, myPosition, piece, moves, i,-1, 1);
                 ChessPosition rightCapture = new ChessPosition(i-1, j-1);
-                if(onBoard(rightCapture)) {
-                    ChessPiece currentPiece = board.getPiece(rightCapture);
-                    if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
-                        if (i - 1 == 1) {
-                            promotePawn(moves, myPosition, rightCapture);
-                        } else {
-                            moves.add(new ChessMove(myPosition, rightCapture, null));
-                        }
-                    }
-                }
+                captureMoves(board, rightCapture, myPosition, piece, moves, i,-1, 1);
             }
         }
         return moves;
+    }
+
+    public void aheadMoves(ChessBoard board, ChessPosition oneAhead, Collection<ChessMove> moves, int i, int j, int k, int l, int m, ChessPosition myPosition){
+        if(board.getPiece(oneAhead) == null){
+            if(i+k == l){
+                moves.add(new ChessMove(myPosition, oneAhead, null));
+                ChessPosition twoAhead = new ChessPosition(i+(2*k), j);
+                if(board.getPiece(twoAhead) == null){
+                    moves.add(new ChessMove(myPosition, twoAhead, null));
+                }
+            }
+            else if( i+k == m){
+                promotePawn(moves, myPosition, oneAhead);
+            }
+            else{
+                moves.add(new ChessMove(myPosition, oneAhead, null));
+            }
+        }
+    }
+
+    public void captureMoves(ChessBoard board, ChessPosition capture, ChessPosition myPosition, ChessPiece piece, Collection<ChessMove> moves, int i, int k, int l){
+        if(onBoard(capture)) {
+            ChessPiece currentPiece = board.getPiece(capture);
+            if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {
+                if (i + k == l) {
+                    promotePawn(moves, myPosition, capture);
+                } else {
+                    moves.add(new ChessMove(myPosition, capture, null));
+                }
+            }
+        }
     }
 }
 
