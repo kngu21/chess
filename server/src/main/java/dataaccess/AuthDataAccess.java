@@ -11,12 +11,16 @@ public class AuthDataAccess implements AuthDAO{
     public AuthData createAuth(String username){
         String newUUID = UUID.randomUUID().toString();
         AuthData newAuth = new AuthData(newUUID, username);
-        authTokens.put(username, newAuth);
+        authTokens.put(newUUID, newAuth);
         return newAuth;
     }
 
-    public AuthData getAuth(String username){
-        return authTokens.get(username);
+    public AuthData getAuth(String authToken){
+        return authTokens.get(authToken);
+    }
+
+    public void removeAuth(String authToken){
+        authTokens.remove(authToken);
     }
 
     public void clear(){

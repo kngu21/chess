@@ -1,5 +1,6 @@
 package server;
 import Handlers.LoginHandler;
+import Handlers.LogoutHandler;
 import Handlers.RegisterHandler;
 import Service.*;
 import com.google.gson.Gson;
@@ -30,6 +31,7 @@ public class Server {
         javalin.post("/user", this::registerUser);
         javalin.delete("/db", this::clearAll);
         javalin.post("/session", this::loginUser);
+        javalin.delete("/session", this::logoutUser);
     }
 
     private void registerUser(Context context) {
@@ -52,6 +54,17 @@ public class Server {
         }
         catch(BadRequestException exception){
             context.status(400).result(new Gson().toJson("Bad request"));
+        }
+    }
+
+    private void logoutUser(Context context){
+        try{
+            LogoutHandler logout = new LogoutHandler(context, userService);
+            logout.result();
+            context.status(200);
+        }
+        catch(UnauthorizedException exception){
+            context.status(400).result(new Gson().toJson("Unauthorized"));
         }
     }
 

@@ -1,5 +1,6 @@
 package Service;
 import Handlers.LoginHandler;
+import Handlers.LogoutHandler;
 import Handlers.RegisterHandler;
 import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
@@ -25,19 +26,23 @@ public class UserService {
         AuthData newData = authDAO.createAuth(request.username());
         return new RegisterHandler.RegisterResult(request.username(), newData.authToken());
     }
-    public LoginHandler.LoginResult login(String username, String password, String authToken) throws BadRequestException {
-        AuthData exists = authDAO.getAuth(username);
+    public LoginHandler.LoginResult login(String username, String password) throws BadRequestException {
+        UserData exists = userDAO.getUser(username);
         if(exists == null){
             throw new BadRequestException("Bad request");
         }
-        if(!Objects.equals(exists.authToken(), authToken)){
-            throw new BadRequestException("Bad request");
-        }
-        UserData user = userDAO.getUser(username);
-        if(!user.password().equals(password)){
+        if(!exists.password().equals(password)){
             throw new BadRequestException("Bad request");
         }
         AuthData newData = authDAO.createAuth(username);
         return new LoginHandler.LoginResult(username, newData.authToken());
+    }
+
+    public void logout(String authToken){
+        AuthData exists = authDAO.getAuth(authToken);
+        if(exists == null){
+            throw new UnauthorizedException("Unauthorized");
+        }
+        authDAO.removeAuth(authToken);
     }
 }
