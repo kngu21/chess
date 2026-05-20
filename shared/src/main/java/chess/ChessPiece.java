@@ -33,7 +33,6 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-        this.counter = 0;
         this.doubleMove = false;
     }
 
@@ -63,14 +62,9 @@ public class ChessPiece {
         return type;
     }
 
-    /* public void move(){
-        counter += 1;
-    }
-     */
 
-    public int getCounter(){
-        return counter;
-    }
+
+
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -97,6 +91,25 @@ public class ChessPiece {
         moves.add(new ChessMove(current, newbie, PieceType.BISHOP));
         moves.add(new ChessMove(current, newbie, PieceType.KNIGHT));
     }
+
+    public void sliders(ChessBoard board, ChessPosition myPosition, int [][] directions, int i, int j, ChessPiece piece, Collection<ChessMove> moves){
+        for(int k = 0; k < directions.length; k++) {
+            while (true) {
+                i += directions[k][0];
+                j += directions[k][1];
+                if (!validMove(board, new ChessPosition(i, j), piece)) {
+                    break;
+                }
+                moves.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                if (board.getPiece(new ChessPosition(i, j)) != null) {
+                    break;
+                }
+            }
+            i = myPosition.getRow();
+            j  = myPosition.getColumn();
+        }
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int i = myPosition.getRow();
@@ -104,57 +117,15 @@ public class ChessPiece {
         ChessPiece piece = new ChessPiece(pieceColor, type);
         if(type == PieceType.BISHOP){
             int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
-            for(int k = 0; k < 4; k++){
-                while(true){
-                    i += directions[k][0];
-                    j += directions[k][1];
-                    if(!validMove(board, new ChessPosition(i,j), piece)){
-                        break;
-                    }
-                    moves.add(new ChessMove(myPosition, new ChessPosition(i,j), null));
-                    if(board.getPiece(new ChessPosition(i,j)) != null){
-                        break;
-                    }
-                }
-                i = myPosition.getRow();
-                j = myPosition.getColumn();
-            }
+            sliders(board,myPosition,directions,i,j,piece,moves);
         }
         if(type == PieceType.ROOK){
             int [][] directions = {{1,0},{0,-1},{-1,0},{0,1}};
-            for(int k = 0; k < 4; k++){
-                while(true){
-                    i += directions[k][0];
-                    j += directions[k][1];
-                    if(!validMove(board, new ChessPosition(i,j), piece)){
-                        break;
-                    }
-                    moves.add(new ChessMove(myPosition, new ChessPosition(i,j), null));
-                    if(board.getPiece(new ChessPosition(i,j)) != null){
-                        break;
-                    }
-                }
-                i = myPosition.getRow();
-                j = myPosition.getColumn();
-            }
+            sliders(board,myPosition,directions,i,j,piece,moves);
         }
         if(type == PieceType.QUEEN){
             int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1},{1,0},{0,-1},{-1,0},{0,1}};
-            for(int k = 0; k < 8; k++){
-                while(true){
-                    i += directions[k][0];
-                    j += directions[k][1];
-                    if(!validMove(board, new ChessPosition(i,j), piece)){
-                        break;
-                    }
-                    moves.add(new ChessMove(myPosition, new ChessPosition(i,j), null));
-                    if(board.getPiece(new ChessPosition(i,j)) != null){
-                        break;
-                    }
-                }
-                i = myPosition.getRow();
-                j = myPosition.getColumn();
-            }
+            sliders(board,myPosition,directions,i,j,piece,moves);
         }
         if(type == PieceType.KING){
             int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1},{1,0},{0,-1},{-1,0},{0,1}};
