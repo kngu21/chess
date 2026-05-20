@@ -63,9 +63,10 @@ public class ChessPiece {
         return type;
     }
 
-    public void move(){
+    /* public void move(){
         counter += 1;
     }
+     */
 
     public int getCounter(){
         return counter;
