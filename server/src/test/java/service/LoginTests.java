@@ -1,10 +1,9 @@
-package Service;
+package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.AuthDataAccess;
 import dataaccess.UserDAO;
 import dataaccess.UserDataAccess;
-import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 

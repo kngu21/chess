@@ -1,6 +1,6 @@
 package Handlers;
-import Service.AlreadyTakenException;
-import Service.UserService;
+import service.AlreadyTakenException;
+import service.UserService;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import model.UserData;

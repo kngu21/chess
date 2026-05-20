@@ -1,6 +1,6 @@
 package Handlers;
-import Service.BadRequestException;
-import Service.UserService;
+import service.BadRequestException;
+import service.UserService;
 import io.javalin.http.Context;
 
 public class LogoutHandler {

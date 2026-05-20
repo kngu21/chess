@@ -1,6 +1,6 @@
 package Handlers;
-import Service.GameService;
-import Service.UnauthorizedException;
+import service.GameService;
+import service.UnauthorizedException;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 

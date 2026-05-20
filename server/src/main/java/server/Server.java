@@ -1,6 +1,6 @@
 package server;
 import Handlers.*;
-import Service.*;
+import service.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;

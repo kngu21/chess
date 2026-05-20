@@ -1,12 +1,10 @@
-package Service;
+package service;
 
 import Handlers.LoginHandler;
-import Handlers.RegisterHandler;
 import dataaccess.AuthDAO;
 import dataaccess.AuthDataAccess;
 import dataaccess.UserDAO;
 import dataaccess.UserDataAccess;
-import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 

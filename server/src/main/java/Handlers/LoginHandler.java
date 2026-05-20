@@ -1,6 +1,6 @@
 package Handlers;
-import Service.BadRequestException;
-import Service.UserService;
+import service.BadRequestException;
+import service.UserService;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 

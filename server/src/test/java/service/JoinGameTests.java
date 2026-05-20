@@ -1,6 +1,5 @@
-package Service;
+package service;
 
-import Handlers.ListGamesHandler;
 import Handlers.LoginHandler;
 import dataaccess.*;
 import model.GameData;
@@ -56,7 +55,7 @@ public class JoinGameTests {
         service2.register(user);
         String token = service2.login("noOne", "oh yeah!").authToken();
         int gameId = service.createGame(token, "test").gameID();
-        assertThrows(Service.BadRequestException.class, () ->
+        assertThrows(service.BadRequestException.class, () ->
                 service.joinGame(token, "GREEN", gameId)
         );
     }

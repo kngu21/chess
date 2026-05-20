@@ -1,4 +1,4 @@
-package Service;
+package service;
 import Handlers.LoginHandler;
 import Handlers.RegisterHandler;
 import dataaccess.AuthDAO;

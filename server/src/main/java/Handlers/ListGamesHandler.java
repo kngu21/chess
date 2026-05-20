@@ -1,6 +1,6 @@
 package Handlers;
-import Service.UnauthorizedException;
-import Service.VoidService;
+import service.UnauthorizedException;
+import service.VoidService;
 import io.javalin.http.Context;
 import model.GameInfo;
 
