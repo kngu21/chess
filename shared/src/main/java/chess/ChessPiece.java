@@ -86,10 +86,10 @@ public class ChessPiece {
     }
 
     public void sliders(ChessBoard board, ChessPosition myPosition, int [][] directions, int i, int j, ChessPiece piece, Collection<ChessMove> moves){
-        for(int k = 0; k < directions.length; k++) {
+        for (int[] direction : directions) {
             while (true) {
-                i += directions[k][0];
-                j += directions[k][1];
+                i += direction[0];
+                j += direction[1];
                 if (!validMove(board, new ChessPosition(i, j), piece)) {
                     break;
                 }
@@ -99,7 +99,17 @@ public class ChessPiece {
                 }
             }
             i = myPosition.getRow();
-            j  = myPosition.getColumn();
+            j = myPosition.getColumn();
+        }
+    }
+
+    public void theKs(int i, int j, int [][] directions, ChessBoard board, ChessPiece piece,
+                      Collection<ChessMove> moves, ChessPosition myPosition){
+        for(int k = 0; k < 8; k++){
+            ChessPosition newbie = new ChessPosition(i+directions[k][0], j+directions[k][1]);
+            if(validMove(board, newbie, piece)){
+                moves.add(new ChessMove(myPosition, newbie, null));
+            }
         }
     }
 
@@ -122,21 +132,11 @@ public class ChessPiece {
         }
         if(type == PieceType.KING){
             int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1},{1,0},{0,-1},{-1,0},{0,1}};
-            for(int k = 0; k < 8; k++){
-                ChessPosition newbie = new ChessPosition(i+directions[k][0], j+directions[k][1]);
-                if(validMove(board, newbie, piece)){
-                    moves.add(new ChessMove(myPosition, newbie, null));
-                }
-            }
+            theKs(i, j, directions, board, piece, moves, myPosition);
         }
         if(type == PieceType.KNIGHT){
             int [][] directions = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{-1,2},{-1,-2},{1,-2}};
-            for(int k = 0; k < 8; k++){
-                ChessPosition newbie = new ChessPosition(i+directions[k][0], j+directions[k][1]);
-                if(validMove(board, newbie, piece)){
-                    moves.add(new ChessMove(myPosition, newbie, null));
-                }
-            }
+            theKs(i, j, directions, board, piece, moves, myPosition);
         }
         if(type == PieceType.PAWN){
             if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
@@ -159,7 +159,8 @@ public class ChessPiece {
         return moves;
     }
 
-    public void aheadMoves(ChessBoard board, ChessPosition oneAhead, Collection<ChessMove> moves, int i, int j, int k, int l, int m, ChessPosition myPosition){
+    public void aheadMoves(ChessBoard board, ChessPosition oneAhead, Collection<ChessMove> moves,
+                           int i, int j, int k, int l, int m, ChessPosition myPosition){
         if(board.getPiece(oneAhead) == null){
             if(i+k == l){
                 moves.add(new ChessMove(myPosition, oneAhead, null));
@@ -177,7 +178,8 @@ public class ChessPiece {
         }
     }
 
-    public void captureMoves(ChessBoard board, ChessPosition capture, ChessPosition myPosition, ChessPiece piece, Collection<ChessMove> moves, int i, int k, int l){
+    public void captureMoves(ChessBoard board, ChessPosition capture, ChessPosition myPosition,
+                             ChessPiece piece, Collection<ChessMove> moves, int i, int k, int l){
         if(onBoard(capture)) {
             ChessPiece currentPiece = board.getPiece(capture);
             if (currentPiece != null && currentPiece.getTeamColor() != piece.getTeamColor()) {

@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     private TeamColor turn;
-    private ChessBoard myBoard;
+    private final ChessBoard myBoard;
 
     @Override
     public boolean equals(Object o) {
@@ -223,8 +223,17 @@ public class ChessGame {
     public boolean checkmateBite(int i, int j, TeamColor teamColor){
         ChessPosition current = new ChessPosition(i,j);
         if(myBoard.getPiece(current) != null && myBoard.getPiece(current).getTeamColor() == teamColor){
-            if(!validMoves(current).isEmpty()){
-                return false;
+            return validMoves(current).isEmpty();
+        }
+        return true;
+    }
+
+    public boolean iterateBoard(TeamColor teamColor){
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                if(!checkmateBite(i, j, teamColor)){
+                    return false;
+                }
             }
         }
         return true;
@@ -232,14 +241,7 @@ public class ChessGame {
 
     public boolean isInCheckmate(TeamColor teamColor) {
         if(isInCheck(teamColor)){
-            for(int i = 1; i < 9; i++){
-                for(int j = 1; j < 9; j++){
-                    if(!checkmateBite(i, j, teamColor)){
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return iterateBoard(teamColor);
         }
         return false;
     }
@@ -253,14 +255,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if(!isInCheck(teamColor)){
-            for(int i = 1; i < 9; i++){
-                for(int j = 1; j < 9; j++){
-                    if(!checkmateBite(i, j, teamColor)){
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return iterateBoard(teamColor);
         }
         return false;
     }
