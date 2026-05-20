@@ -11,7 +11,7 @@ public class AuthDataAccess implements AuthDAO{
     public AuthData createAuth(String username){
         String newUUID = UUID.randomUUID().toString();
         AuthData newAuth = new AuthData(newUUID, username);
-        authTokens.put(newUUID, newAuth);
+        authTokens.put(username, newAuth);
         return newAuth;
     }
 

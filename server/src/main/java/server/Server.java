@@ -1,9 +1,7 @@
 package server;
+import Handlers.LoginHandler;
 import Handlers.RegisterHandler;
-import Service.AlreadyTakenException;
-import Service.GameService;
-import Service.UserService;
-import Service.VoidService;
+import Service.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.*;
@@ -31,6 +29,7 @@ public class Server {
 
         javalin.post("/user", this::registerUser);
         javalin.delete("/db", this::clearAll);
+        javalin.post("/session", this::loginUser);
     }
 
     private void registerUser(Context context) {
@@ -43,6 +42,17 @@ public class Server {
             context.status(403).result(new Gson().toJson("Username already taken"));
         }
 
+    }
+
+    private void loginUser(Context context){
+        try {
+            LoginHandler loggie = new LoginHandler(context, userService);
+            context.result(new Gson().toJson(loggie.result()));
+            context.status(200);
+        }
+        catch(BadRequestException exception){
+            context.status(400).result(new Gson().toJson("Bad request"));
+        }
     }
 
     private void clearAll(Context context){
