@@ -5,13 +5,9 @@ import Service.GameService;
 import Service.UserService;
 import Service.VoidService;
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.AuthDataAccess;
-import dataaccess.UserDAO;
-import dataaccess.UserDataAccess;
+import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
-import io.javalin.json.JavalinGson;
 
 public class Server {
 
@@ -21,17 +17,20 @@ public class Server {
     private final VoidService voidService;
     private AuthDAO auth;
     private UserDAO user;
+    private GameDAO game;
 
     public Server() {
         this.auth = new AuthDataAccess();
         this.user = new UserDataAccess();
+        this.game = new GameDataAccess();
         this.userService = new UserService(user, auth);
         this.gameService = new GameService();
-        this.voidService = new VoidService();
+        this.voidService = new VoidService(user,auth, game);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
 
         javalin.post("/user", this::registerUser);
+        javalin.delete("/db", this::clearAll);
     }
 
     private void registerUser(Context context) {
@@ -44,6 +43,16 @@ public class Server {
             context.status(403).result(new Gson().toJson("Username already taken"));
         }
 
+    }
+
+    private void clearAll(Context context){
+        try {
+            voidService.clear();
+            context.status(200);
+        }
+        catch(DataAccessException exception){
+            context.status(500).result(new Gson().toJson("Error accessing data"));
+        }
     }
 
     public int run(int desiredPort) {
