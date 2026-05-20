@@ -22,13 +22,21 @@ public class LogoutTests {
         service = new UserService(user, auth);
     }
     @Test
-    void testLogout() throws AlreadyTakenException {
-        // Arrange
-        UserData notTaken = new UserData("noOne", "oh yeah!", "email.com");
-        service.register(notTaken);
-        LoginHandler.LoginResult result = service.login("noOne", "oh yeah!");
-        String newAuth = result.authToken();
-        assertDoesNotThrow(() -> service.logout(newAuth));
+    void testLogout() throws Exception, AlreadyTakenException {
+
+        UserData user = new UserData("noOne", "oh yeah!", "email.com");
+
+        service.register(user);
+
+        LoginHandler.LoginResult loginResult = service.login("noOne", "oh yeah!");
+
+        String authToken = loginResult.authToken();
+
+        service.logout(authToken);
+
+        assertThrows(UnauthorizedException.class, () -> {
+            service.logout(authToken);
+        });
     }
     @Test
     void testBadAuth() throws AlreadyTakenException{
