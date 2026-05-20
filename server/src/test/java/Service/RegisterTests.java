@@ -29,7 +29,6 @@ public class RegisterTests {
         user.createUser(new UserData("kngu21", "oh yeah!", "email.com"));
         UserData taken = new UserData("kngu21", "oh yeah!", "email.com");
         assertThrows(AlreadyTakenException.class, () -> service.register(taken));
-
     }
     @Test
     void testAuthToken(){

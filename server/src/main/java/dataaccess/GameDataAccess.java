@@ -5,19 +5,19 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class GameDataAccess implements GameDAO{
-    private HashMap<Integer, GameData> games;
+    private HashMap<String, GameData> games;
     public GameDataAccess(){
         this.games = new HashMap<>();
     }
-    public GameData createGame(String username){
+    public GameData createGame(String gameName){
         int hi = 1;
         ChessGame game = new ChessGame();
-        GameData newGame = new GameData(1234, "whiteUsername", "blackUsername", "gameName", game);
-        games.put(hi, newGame);
+        GameData newGame = new GameData(1234, "whiteUsername", "blackUsername", "gamey", game);
+        games.put(gameName, newGame);
         return newGame;
     }
 
-    public GameData getGame(int gameID){
+    public GameData getGame(String gameID){
         return games.get(gameID);
     }
 
