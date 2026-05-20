@@ -93,6 +93,7 @@ public class Server {
             JoinGameHandler joinGame = new JoinGameHandler(context, gameService);
             joinGame.result();
             context.status(200);
+            context.json(new Object());
         }
         catch(AlreadyTakenException exception){
             context.status(400).result(new Gson().toJson("Already taken"));

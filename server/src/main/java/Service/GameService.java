@@ -38,12 +38,14 @@ public class GameService {
                 throw new AlreadyTakenException("Already taken");
             }
             gameDAO.replaceGame(new GameData(gameID, exists.username(), game.blackUsername(), game.gameName(), game.game()));
+            return;
         }
         if(Objects.equals(playerColor, "BLACK")){
             if(game.blackUsername() != null){
                 throw new AlreadyTakenException("Already taken");
             }
             gameDAO.replaceGame(new GameData(gameID, game.whiteUsername(), exists.username(), game.gameName(), game.game()));
+            return;
         }
         throw new BadRequestException("Bad request");
     }

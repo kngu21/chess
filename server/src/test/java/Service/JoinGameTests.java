@@ -3,11 +3,11 @@ package Service;
 import Handlers.ListGamesHandler;
 import Handlers.LoginHandler;
 import dataaccess.*;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JoinGameTests {
     private UserDAO user;
@@ -30,17 +30,35 @@ public class JoinGameTests {
         service2.register(user);
 
         LoginHandler.LoginResult loginResult = service2.login("noOne", "oh yeah!");
-        service.createGame(loginResult.authToken(), "help me");
-        service.createGame(loginResult.authToken(), "here we go");
-        ListGamesHandler.ListGamesResult result = new ListGamesHandler.ListGamesResult(service1.listGames(loginResult.authToken()));
-        assertEquals(result.game().size(), 2);
+        String authToken = loginResult.authToken();
+
+        int gameId1 = service.createGame(authToken, "help me").gameID();
+        int gameId2 = service.createGame(authToken, "here we go").gameID();
+
+        // Act
+        service.joinGame(authToken, "WHITE", gameId1);
+        service.joinGame(authToken,"BLACK", gameId2);
+
+        // Assert
+        GameData game1 = game.getGame(gameId1);
+        GameData game2 = game.getGame(gameId2);
+
+        assertEquals("noOne", game1.whiteUsername());
+        assertNull(game1.blackUsername());
+
+        assertEquals("noOne", game2.blackUsername());
+        assertNull(game2.whiteUsername());
     }
     @Test
-    void incorrectTest() throws AlreadyTakenException {
+    void joinGame_invalidColor_throwsBadRequest() throws AlreadyTakenException {
+        // Arrange
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);
-
-        LoginHandler.LoginResult loginResult = service2.login("noOne", "oh yeah!");
-        assertThrows(UnauthorizedException.class, () -> service.createGame("yay", "let's go"));
+        String token = service2.login("noOne", "oh yeah!").authToken();
+        int gameId = service.createGame(token, "test").gameID();
+        assertThrows(Service.BadRequestException.class, () ->
+                service.joinGame(token, "GREEN", gameId)
+        );
     }
+
 }

@@ -14,7 +14,7 @@ public class GameDataAccess implements GameDAO{
     public GameData createGame(String gameName){
         ChessGame game = new ChessGame();
         GameData newGame = new GameData(GameID++, null, null, gameName, game);
-        games.put(GameID, newGame);
+        games.put(newGame.GameID(), newGame);
         return newGame;
     }
 
