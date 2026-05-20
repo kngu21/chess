@@ -32,7 +32,7 @@ public class ListGamesTests {
         LoginHandler.LoginResult loginResult = service2.login("noOne", "oh yeah!");
         service.createGame(loginResult.authToken(), "help me");
         ListGamesHandler.ListGamesResult result = new ListGamesHandler.ListGamesResult(service1.listGames(loginResult.authToken()));
-        assertEquals(result.game().size(), 1);
+        assertEquals(result.games().size(), 1);
     }
     @Test
     void incorrectTest() throws AlreadyTakenException {

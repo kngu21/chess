@@ -10,7 +10,7 @@ public class ListGamesHandler {
     private final Context text;
     private VoidService service;
 
-    public record ListGamesResult(ArrayList<GameInfo> game){};
+    public record ListGamesResult(ArrayList<GameInfo> games){};
 
     public ListGamesHandler(Context text, VoidService service){
         this.text = text;
@@ -19,6 +19,7 @@ public class ListGamesHandler {
 
     public ListGamesHandler.ListGamesResult result() throws UnauthorizedException {
         String auth = text.header("authorization");
-        return new ListGamesResult(service.listGames(auth));
+        ArrayList<GameInfo> games = service.listGames(auth);
+        return new ListGamesResult(games);
     }
 }

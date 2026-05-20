@@ -13,6 +13,7 @@ public class UserService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
+
     public RegisterHandler.RegisterResult register(UserData request) throws AlreadyTakenException {
         UserData exists = userDAO.getUser(request.username());
         if(exists != null){
@@ -23,13 +24,14 @@ public class UserService {
         AuthData newData = authDAO.createAuth(request.username());
         return new RegisterHandler.RegisterResult(request.username(), newData.authToken());
     }
+
     public LoginHandler.LoginResult login(String username, String password) throws BadRequestException {
         UserData exists = userDAO.getUser(username);
         if(exists == null){
-            throw new BadRequestException("Bad request");
+            throw new UnauthorizedException("Unauthorized");
         }
         if(!exists.password().equals(password)){
-            throw new BadRequestException("Bad request");
+            throw new UnauthorizedException("Unauthorized");
         }
         AuthData newData = authDAO.createAuth(username);
         return new LoginHandler.LoginResult(username, newData.authToken());

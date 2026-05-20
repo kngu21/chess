@@ -6,6 +6,8 @@ import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 
+import java.util.Map;
+
 public class Server {
 
     private final Javalin javalin;
@@ -34,24 +36,40 @@ public class Server {
 
     private void registerUser(Context context) {
         try {
+            RegisterHandler.RegisterRequest body = new Gson().fromJson(context.body(), RegisterHandler.RegisterRequest.class);
             RegisterHandler reggie = new RegisterHandler(context, userService);
+            if (body == null || body.username() == null || body.password() == null || body.email() == null) {
+                context.status(400).result(new Gson().toJson(Map.of("message", "Error: bad request")));
+                return;
+            }
             context.result(new Gson().toJson(reggie.result()));
             context.status(200);
         }
-        catch(AlreadyTakenException exception){
-            context.status(403).result(new Gson().toJson("Username already taken"));
+        catch(BadRequestException exception){
+            context.status(400).result(new Gson().toJson(Map.of("message","Error: bad request")));
         }
-
+        catch(AlreadyTakenException exception){
+            context.status(403).result(new Gson().toJson(Map.of("message","Error: already taken")));
+        }
     }
 
     private void loginUser(Context context){
         try {
+            LoginHandler.LoginRequest body = new Gson().fromJson(context.body(), LoginHandler.LoginRequest.class);
+            if (body == null || body.username() == null || body.password() == null) {
+                context.status(400).result(new Gson().toJson(Map.of("message", "Error: bad request")));
+                return;
+            }
             LoginHandler loggie = new LoginHandler(context, userService);
-            context.result(new Gson().toJson(loggie.result()));
-            context.status(200);
+            var result = loggie.result();
+            context.status(200).result(new Gson().toJson(result));;
+
         }
         catch(BadRequestException exception){
-            context.status(400).result(new Gson().toJson("Bad request"));
+            context.status(400).result(new Gson().toJson(Map.of("message","Error: bad request")));
+        }
+        catch(UnauthorizedException exception){
+            context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
     }
 
@@ -59,32 +77,41 @@ public class Server {
         try{
             LogoutHandler logout = new LogoutHandler(context, userService);
             logout.result();
-            context.status(200);
+            context.status(200).result("{}");
         }
         catch(UnauthorizedException exception){
-            context.status(400).result(new Gson().toJson("Unauthorized"));
+            context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
     }
 
     private void listGames(Context context){
         try{
             ListGamesHandler listGames = new ListGamesHandler(context, voidService);
-            context.result(new Gson().toJson(listGames.result()));
+            var result = listGames.result();
             context.status(200);
+            context.result(new Gson().toJson(result));
         }
         catch(UnauthorizedException exception){
-            context.status(400).result(new Gson().toJson("Unauthorized"));
+            context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
     }
 
     private void createGame(Context context){
         try {
+            CreateGameHandler.CreateGameRequest body = new Gson().fromJson(context.body(), CreateGameHandler.CreateGameRequest.class);
+            if (body == null || body.gameName() == null) {
+                context.status(400).result(new Gson().toJson(Map.of("message", "Error: bad request")));
+                return;
+            }
             CreateGameHandler createGame = new CreateGameHandler(context, gameService);
             context.result(new Gson().toJson(createGame.result()));
             context.status(200);
         }
+        catch(BadRequestException exception){
+            context.status(400).result(new Gson().toJson(Map.of("message","Error: bad request")));
+        }
         catch(UnauthorizedException exception){
-            context.status(400).result(new Gson().toJson("Unauthorized"));
+            context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
     }
 
@@ -92,21 +119,26 @@ public class Server {
         try{
             JoinGameHandler joinGame = new JoinGameHandler(context, gameService);
             joinGame.result();
-            context.status(200);
-            context.json(new Object());
+            context.status(200).result("{}");
+        }
+        catch(BadRequestException exception){
+            context.status(400).result(new Gson().toJson(Map.of("message","Error: bad request")));
+        }
+        catch(UnauthorizedException exception){
+            context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
         catch(AlreadyTakenException exception){
-            context.status(400).result(new Gson().toJson("Already taken"));
+            context.status(403).result(new Gson().toJson(Map.of("message", "Error: already taken")));
         }
     }
 
     private void clearAll(Context context){
         try {
             voidService.clear();
-            context.status(200);
+            context.status(200).result("{}");
         }
         catch(DataAccessException exception){
-            context.status(500).result(new Gson().toJson("Error accessing data"));
+            context.status(500).result(new Gson().toJson(Map.of("message", "Error accessing data")));
         }
     }
 
