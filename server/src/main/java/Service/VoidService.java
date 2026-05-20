@@ -6,6 +6,8 @@ import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
+import model.GameInfo;
+
 import java.util.ArrayList;
 
 public class VoidService {
@@ -23,20 +25,16 @@ public class VoidService {
         gameDAO.clear();
     }
 
-    public ArrayList<GameData> listGames(String authToken) throws UnauthorizedException {
+    public ArrayList<GameInfo> listGames(String authToken) throws UnauthorizedException {
         AuthData data = authDAO.getAuth(authToken);
         if(data == null){
             throw new UnauthorizedException("Unauthorized");
         }
-        return gameDAO.listGames();
-    }
-
-    public CreateGameHandler.CreateGameResult createGame(String authToken, String gameName) throws UnauthorizedException{
-        AuthData exists = authDAO.getAuth(authToken);
-        if(exists == null){
-            throw new UnauthorizedException("Unauthorized");
+        ArrayList<GameData> list = gameDAO.listGames();
+        ArrayList<GameInfo> newList = new ArrayList<>();
+        for(GameData g : list){
+            newList.add(new GameInfo(g.GameID(), g.whiteUsername(), g.blackUsername(), g.gameName()));
         }
-        GameData data = gameDAO.createGame(gameName);
-        return new CreateGameHandler.CreateGameResult(data.GameID(), data.whiteUsername(), data.blackUsername(), gameName);
+        return newList;
     }
 }

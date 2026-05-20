@@ -6,5 +6,6 @@ public interface GameDAO {
     GameData createGame(String username);
     GameData getGame(int gameID);
     ArrayList<GameData> listGames();
+    void replaceGame(GameData newGame);
     void clear();
 }

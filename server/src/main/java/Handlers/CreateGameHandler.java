@@ -1,18 +1,17 @@
 package Handlers;
-
+import Service.GameService;
 import Service.UnauthorizedException;
-import Service.VoidService;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 
 public class CreateGameHandler {
     private final Context text;
-    private VoidService service;
+    private final GameService service;
 
     public record CreateGameRequest(String gameName){};
     public record CreateGameResult(int gameID, String whiteUsername, String blackUsername, String gameName){};
 
-    public CreateGameHandler(Context text, VoidService service){
+    public CreateGameHandler(Context text, GameService service){
         this.text = text;
         this.service = service;
     }

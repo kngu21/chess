@@ -1,10 +1,50 @@
 package Service;
+import Handlers.CreateGameHandler;
+import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
+import dataaccess.UserDAO;
+import model.AuthData;
+import model.GameData;
+
+import java.util.Objects;
 
 public class GameService {
+    private final AuthDAO authDAO;
     private final GameDAO gameDAO;
-    public GameService(GameDAO gameDAO){
+    public GameService(GameDAO gameDAO, UserDAO userDAO, AuthDAO authDAO){
         this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
+    }
+    public CreateGameHandler.CreateGameResult createGame(String authToken, String gameName) throws UnauthorizedException{
+        AuthData exists = authDAO.getAuth(authToken);
+        if(exists == null){
+            throw new UnauthorizedException("Unauthorized");
+        }
+        GameData data = gameDAO.createGame(gameName);
+        return new CreateGameHandler.CreateGameResult(data.GameID(), data.whiteUsername(), data.blackUsername(), gameName);
     }
 
+    public void joinGame(String authToken, String playerColor, int gameID) throws AlreadyTakenException {
+        AuthData exists = authDAO.getAuth(authToken);
+        if(exists == null){
+            throw new UnauthorizedException("Unauthorized");
+        }
+        GameData game = gameDAO.getGame(gameID);
+        if(game == null){
+            throw new BadRequestException("Bad request");
+        }
+        if(Objects.equals(playerColor, "WHITE")){
+            if(game.whiteUsername() != null){
+                throw new AlreadyTakenException("Already taken");
+            }
+            gameDAO.replaceGame(new GameData(gameID, exists.username(), game.blackUsername(), game.gameName(), game.game()));
+        }
+        if(Objects.equals(playerColor, "BLACK")){
+            if(game.blackUsername() != null){
+                throw new AlreadyTakenException("Already taken");
+            }
+            gameDAO.replaceGame(new GameData(gameID, game.whiteUsername(), exists.username(), game.gameName(), game.game()));
+        }
+        throw new BadRequestException("Bad request");
+    }
 }

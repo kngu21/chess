@@ -2,7 +2,7 @@ package Handlers;
 import Service.UnauthorizedException;
 import Service.VoidService;
 import io.javalin.http.Context;
-import model.GameData;
+import model.GameInfo;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ public class ListGamesHandler {
     private final Context text;
     private VoidService service;
 
-    public record ListGamesResult(ArrayList<GameData> games){};
+    public record ListGamesResult(ArrayList<GameInfo> game){};
 
     public ListGamesHandler(Context text, VoidService service){
         this.text = text;

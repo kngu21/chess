@@ -12,17 +12,14 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final VoidService voidService;
-    private AuthDAO auth;
-    private UserDAO user;
-    private GameDAO game;
 
     public Server() {
-        this.auth = new AuthDataAccess();
-        this.user = new UserDataAccess();
-        this.game = new GameDataAccess();
+        AuthDAO auth = new AuthDataAccess();
+        UserDAO user = new UserDataAccess();
+        GameDAO game = new GameDataAccess();
         this.userService = new UserService(user, auth);
-        this.gameService = new GameService(game);
-        this.voidService = new VoidService(user,auth, game);
+        this.gameService = new GameService(game, user, auth);
+        this.voidService = new VoidService(user, auth, game);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
 
@@ -32,6 +29,7 @@ public class Server {
         javalin.delete("/session", this::logoutUser);
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
+        javalin.put("/game", this::joinGame);
     }
 
     private void registerUser(Context context) {
@@ -81,12 +79,23 @@ public class Server {
 
     private void createGame(Context context){
         try {
-            CreateGameHandler createGame = new CreateGameHandler(context, voidService);
+            CreateGameHandler createGame = new CreateGameHandler(context, gameService);
             context.result(new Gson().toJson(createGame.result()));
             context.status(200);
         }
         catch(UnauthorizedException exception){
             context.status(400).result(new Gson().toJson("Unauthorized"));
+        }
+    }
+
+    private void joinGame(Context context){
+        try{
+            JoinGameHandler joinGame = new JoinGameHandler(context, gameService);
+            joinGame.result();
+            context.status(200);
+        }
+        catch(AlreadyTakenException exception){
+            context.status(400).result(new Gson().toJson("Already taken"));
         }
     }
 

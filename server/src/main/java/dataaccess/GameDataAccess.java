@@ -12,13 +12,19 @@ public class GameDataAccess implements GameDAO{
         this.GameID = 1;
     }
     public GameData createGame(String gameName){
-        GameData newGame = new GameData(GameID++, null, null, gameName);
+        ChessGame game = new ChessGame();
+        GameData newGame = new GameData(GameID++, null, null, gameName, game);
         games.put(GameID, newGame);
         return newGame;
     }
 
     public GameData getGame(int gameID){
         return games.get(gameID);
+    }
+
+    public void replaceGame(GameData newGame){
+        GameData original = games.get(newGame.GameID());
+        games.put(original.GameID(), newGame);
     }
 
     public ArrayList<GameData> listGames(){
