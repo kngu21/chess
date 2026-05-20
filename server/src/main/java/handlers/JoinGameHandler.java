@@ -1,4 +1,4 @@
-package Handlers;
+package handlers;
 
 import service.AlreadyTakenException;
 import service.GameService;
@@ -11,7 +11,6 @@ public class JoinGameHandler {
     private final GameService service;
 
     public record JoinGameRequest(String playerColor, int gameID){}
-    public record JoinGameResult(int gameID, String whiteUsername, String blackUsername, String gameName){}
 
     public JoinGameHandler(Context text, GameService service){
         this.text = text;

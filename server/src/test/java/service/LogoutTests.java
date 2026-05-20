@@ -1,6 +1,6 @@
 package service;
 
-import Handlers.LoginHandler;
+import handlers.LoginHandler;
 import dataaccess.AuthDAO;
 import dataaccess.AuthDataAccess;
 import dataaccess.UserDAO;
@@ -11,30 +11,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LogoutTests {
-    private UserDAO user;
-    private AuthDAO auth;
-    private UserService service;
+    private final UserService service;
     public LogoutTests() {
-        user = new UserDataAccess();
-        auth = new AuthDataAccess();
+        UserDAO user = new UserDataAccess();
+        AuthDAO auth = new AuthDataAccess();
         service = new UserService(user, auth);
     }
     @Test
-    void testLogout() throws Exception, AlreadyTakenException {
+    void testLogout() throws AlreadyTakenException {
 
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
 
         service.register(user);
 
         LoginHandler.LoginResult loginResult = service.login("noOne", "oh yeah!");
-
         String authToken = loginResult.authToken();
-
         service.logout(authToken);
-
-        assertThrows(UnauthorizedException.class, () -> {
-            service.logout(authToken);
-        });
+        assertThrows(UnauthorizedException.class, () -> service.logout(authToken));
     }
     @Test
     void testBadAuth() throws AlreadyTakenException{

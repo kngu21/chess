@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RegisterTests {
-    private UserDAO user;
-    private AuthDAO auth;
-    private UserService service;
+    private final UserDAO user;
+    private final AuthDAO auth;
+    private final UserService service;
     public RegisterTests() {
         user = new UserDataAccess();
         auth = new AuthDataAccess();

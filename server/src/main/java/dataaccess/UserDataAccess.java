@@ -3,7 +3,7 @@ import model.UserData;
 import java.util.HashMap;
 
 public class UserDataAccess implements UserDAO{
-    private HashMap<String, UserData> data;
+    private final HashMap<String, UserData> data;
     public UserDataAccess(){
         this.data = new HashMap<>();
     }

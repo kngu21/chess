@@ -1,6 +1,6 @@
 package service;
-import Handlers.LoginHandler;
-import Handlers.RegisterHandler;
+import handlers.LoginHandler;
+import handlers.RegisterHandler;
 import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import model.AuthData;

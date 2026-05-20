@@ -1,7 +1,7 @@
 package service;
 
-import Handlers.ListGamesHandler;
-import Handlers.LoginHandler;
+import handlers.ListGamesHandler;
+import handlers.LoginHandler;
 import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -10,17 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ListGamesTests {
-    private UserDAO user;
-    private AuthDAO auth;
-    private GameDAO game;
-    private GameService service;
-    private VoidService service1;
-    private UserService service2;
+    private final GameService service;
+    private final VoidService service1;
+    private final UserService service2;
     public ListGamesTests() {
-        user = new UserDataAccess();
-        auth = new AuthDataAccess();
-        game = new GameDataAccess();
-        service = new GameService(game, user, auth);
+        UserDAO user = new UserDataAccess();
+        AuthDAO auth = new AuthDataAccess();
+        GameDAO game = new GameDataAccess();
+        service = new GameService(game, auth);
         service1 = new VoidService(user, auth, game);
         service2 = new UserService(user, auth);
     }
@@ -32,7 +29,7 @@ public class ListGamesTests {
         LoginHandler.LoginResult loginResult = service2.login("noOne", "oh yeah!");
         service.createGame(loginResult.authToken(), "help me");
         ListGamesHandler.ListGamesResult result = new ListGamesHandler.ListGamesResult(service1.listGames(loginResult.authToken()));
-        assertEquals(result.games().size(), 1);
+        assertEquals(1, result.games().size());
     }
     @Test
     void incorrectTest() throws AlreadyTakenException {

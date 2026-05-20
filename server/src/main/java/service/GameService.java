@@ -1,8 +1,7 @@
 package service;
-import Handlers.CreateGameHandler;
+import handlers.CreateGameHandler;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 
@@ -11,7 +10,7 @@ import java.util.Objects;
 public class GameService {
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
-    public GameService(GameDAO gameDAO, UserDAO userDAO, AuthDAO authDAO){
+    public GameService(GameDAO gameDAO, AuthDAO authDAO){
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }

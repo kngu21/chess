@@ -1,4 +1,4 @@
-package Handlers;
+package handlers;
 import service.UnauthorizedException;
 import service.VoidService;
 import io.javalin.http.Context;
@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 public class ListGamesHandler {
     private final Context text;
-    private VoidService service;
+    private final VoidService service;
 
-    public record ListGamesResult(ArrayList<GameInfo> games){};
+    public record ListGamesResult(ArrayList<GameInfo> games){}
 
     public ListGamesHandler(Context text, VoidService service){
         this.text = text;

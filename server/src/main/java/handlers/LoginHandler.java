@@ -1,4 +1,4 @@
-package Handlers;
+package handlers;
 import service.BadRequestException;
 import service.UserService;
 import com.google.gson.Gson;
@@ -6,10 +6,10 @@ import io.javalin.http.Context;
 
 public class LoginHandler {
     private final Context text;
-    private UserService service;
+    private final UserService service;
 
-    public record LoginRequest(String username, String password){};
-    public record LoginResult(String username, String authToken){};
+    public record LoginRequest(String username, String password){}
+    public record LoginResult(String username, String authToken){}
 
     public LoginHandler(Context text, UserService service){
         this.text = text;

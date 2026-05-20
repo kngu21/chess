@@ -1,6 +1,6 @@
 package service;
 
-import Handlers.LoginHandler;
+import handlers.LoginHandler;
 import dataaccess.*;
 import model.GameData;
 import model.UserData;
@@ -9,18 +9,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JoinGameTests {
-    private UserDAO user;
-    private AuthDAO auth;
-    private GameDAO game;
-    private GameService service;
-    private VoidService service1;
-    private UserService service2;
+    private final GameDAO game;
+    private final GameService service;
+    private final UserService service2;
     public JoinGameTests() {
-        user = new UserDataAccess();
-        auth = new AuthDataAccess();
+        UserDAO user = new UserDataAccess();
+        AuthDAO auth = new AuthDataAccess();
         game = new GameDataAccess();
-        service = new GameService(game, user, auth);
-        service1 = new VoidService(user, auth, game);
+        service = new GameService(game, auth);
         service2 = new UserService(user, auth);
 }
     @Test
@@ -49,7 +45,7 @@ public class JoinGameTests {
         assertNull(game2.whiteUsername());
     }
     @Test
-    void joinGame_invalidColor_throwsBadRequest() throws AlreadyTakenException {
+    void testIncorrect() throws AlreadyTakenException {
         // Arrange
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);

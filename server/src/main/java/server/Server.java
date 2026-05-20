@@ -1,5 +1,5 @@
 package server;
-import Handlers.*;
+import handlers.*;
 import service.*;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -20,7 +20,7 @@ public class Server {
         UserDAO user = new UserDataAccess();
         GameDAO game = new GameDataAccess();
         this.userService = new UserService(user, auth);
-        this.gameService = new GameService(game, user, auth);
+        this.gameService = new GameService(game, auth);
         this.voidService = new VoidService(user, auth, game);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
@@ -62,7 +62,7 @@ public class Server {
             }
             LoginHandler loggie = new LoginHandler(context, userService);
             var result = loggie.result();
-            context.status(200).result(new Gson().toJson(result));;
+            context.status(200).result(new Gson().toJson(result));
 
         }
         catch(BadRequestException exception){

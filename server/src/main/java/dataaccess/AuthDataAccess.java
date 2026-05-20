@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.HashMap;
 
 public class AuthDataAccess implements AuthDAO{
-    private HashMap<String, AuthData> authTokens;
+    private final HashMap<String, AuthData> authTokens;
     public AuthDataAccess(){
         this.authTokens = new HashMap<>();
     }

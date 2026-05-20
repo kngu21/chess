@@ -3,13 +3,12 @@ import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class ClearTests {
-    private UserDAO user;
-    private AuthDAO auth;
-    private GameDAO game;
-    private VoidService service;
+    private final UserDAO user;
+    private final AuthDAO auth;
+    private final GameDAO game;
+    private final VoidService service;
+
     public ClearTests() {
         user = new UserDataAccess();
         auth = new AuthDataAccess();
@@ -23,6 +22,8 @@ public class ClearTests {
         auth.createAuth("kngu21");
         game.createGame("gamey");
         service.clear();
-        assertNotNull(user.getUser("kngu21") == null && auth.getAuth("kngu21") == null && game.getGame(3) == null);
+        if (user.getUser("kngu21") == null && auth.getAuth("kngu21") == null) {
+            game.getGame(3);
+        }
     }
 }

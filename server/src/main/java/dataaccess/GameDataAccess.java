@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GameDataAccess implements GameDAO{
-    private HashMap<Integer, GameData> games;
+    private final HashMap<Integer, GameData> games;
     private int GameID;
     public GameDataAccess(){
         this.games = new HashMap<>();
@@ -28,7 +28,7 @@ public class GameDataAccess implements GameDAO{
     }
 
     public ArrayList<GameData> listGames(){
-        return new ArrayList<GameData>(games.values());
+        return new ArrayList<>(games.values());
     }
 
     public void clear(){

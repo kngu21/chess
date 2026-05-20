@@ -1,4 +1,4 @@
-package Handlers;
+package handlers;
 import service.AlreadyTakenException;
 import service.UserService;
 import com.google.gson.Gson;
@@ -7,10 +7,10 @@ import model.UserData;
 
 public class RegisterHandler {
     private final Context text;
-    private UserService service;
+    private final UserService service;
 
-    public record RegisterRequest(String username, String password, String email){};
-    public record RegisterResult(String username, String authToken){};
+    public record RegisterRequest(String username, String password, String email){}
+    public record RegisterResult(String username, String authToken){}
 
     public RegisterHandler(Context text, UserService service){
         this.text = text;

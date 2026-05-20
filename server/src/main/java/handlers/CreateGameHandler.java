@@ -1,4 +1,4 @@
-package Handlers;
+package handlers;
 import service.GameService;
 import service.UnauthorizedException;
 import com.google.gson.Gson;
@@ -8,8 +8,8 @@ public class CreateGameHandler {
     private final Context text;
     private final GameService service;
 
-    public record CreateGameRequest(String gameName){};
-    public record CreateGameResult(int gameID, String whiteUsername, String blackUsername, String gameName){};
+    public record CreateGameRequest(String gameName){}
+    public record CreateGameResult(int gameID, String whiteUsername, String blackUsername, String gameName){}
 
     public CreateGameHandler(Context text, GameService service){
         this.text = text;
