@@ -9,18 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ListGamesTests {
-    private final GameService service;
-    private final VoidService service1;
-    private final UserService service2;
-    public ListGamesTests() {
-        UserDAO user = new UserDataAccess();
-        AuthDAO auth = new AuthDataAccess();
-        GameDAO game = new GameDataAccess();
-        service = new GameService(game, auth);
-        service1 = new VoidService(user, auth, game);
-        service2 = new UserService(user, auth);
-    }
+public class ListGamesTests extends BaseTest{
     @Test
     void testCorrect() throws AlreadyTakenException {
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
