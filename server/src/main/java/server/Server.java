@@ -1,7 +1,5 @@
 package server;
-import Handlers.LoginHandler;
-import Handlers.LogoutHandler;
-import Handlers.RegisterHandler;
+import Handlers.*;
 import Service.*;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -23,7 +21,7 @@ public class Server {
         this.user = new UserDataAccess();
         this.game = new GameDataAccess();
         this.userService = new UserService(user, auth);
-        this.gameService = new GameService();
+        this.gameService = new GameService(game);
         this.voidService = new VoidService(user,auth, game);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
@@ -32,6 +30,8 @@ public class Server {
         javalin.delete("/db", this::clearAll);
         javalin.post("/session", this::loginUser);
         javalin.delete("/session", this::logoutUser);
+        javalin.get("/game", this::listGames);
+        javalin.post("/game", this::createGame);
     }
 
     private void registerUser(Context context) {
@@ -61,6 +61,28 @@ public class Server {
         try{
             LogoutHandler logout = new LogoutHandler(context, userService);
             logout.result();
+            context.status(200);
+        }
+        catch(UnauthorizedException exception){
+            context.status(400).result(new Gson().toJson("Unauthorized"));
+        }
+    }
+
+    private void listGames(Context context){
+        try{
+            ListGamesHandler listGames = new ListGamesHandler(context, voidService);
+            context.result(new Gson().toJson(listGames.result()));
+            context.status(200);
+        }
+        catch(UnauthorizedException exception){
+            context.status(400).result(new Gson().toJson("Unauthorized"));
+        }
+    }
+
+    private void createGame(Context context){
+        try {
+            CreateGameHandler createGame = new CreateGameHandler(context, voidService);
+            context.result(new Gson().toJson(createGame.result()));
             context.status(200);
         }
         catch(UnauthorizedException exception){

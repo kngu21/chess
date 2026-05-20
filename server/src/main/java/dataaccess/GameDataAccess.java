@@ -1,24 +1,28 @@
 package dataaccess;
 import chess.ChessGame;
 import model.GameData;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class GameDataAccess implements GameDAO{
-    private HashMap<String, GameData> games;
+    private HashMap<Integer, GameData> games;
+    private int GameID;
     public GameDataAccess(){
         this.games = new HashMap<>();
+        this.GameID = 1;
     }
     public GameData createGame(String gameName){
-        int hi = 1;
-        ChessGame game = new ChessGame();
-        GameData newGame = new GameData(1234, "whiteUsername", "blackUsername", "gamey", game);
-        games.put(gameName, newGame);
+        GameData newGame = new GameData(GameID++, null, null, gameName);
+        games.put(GameID, newGame);
         return newGame;
     }
 
-    public GameData getGame(String gameID){
+    public GameData getGame(int gameID){
         return games.get(gameID);
+    }
+
+    public ArrayList<GameData> listGames(){
+        return new ArrayList<GameData>(games.values());
     }
 
     public void clear(){

@@ -24,6 +24,6 @@ public class ClearTests {
         auth.createAuth("kngu21");
         game.createGame("gamey");
         service.clear();
-        assertNotNull(user.getUser("kngu21") == null && auth.getAuth("kngu21") == null && game.getGame("gamey") == null);
+        assertNotNull(user.getUser("kngu21") == null && auth.getAuth("kngu21") == null && game.getGame(3) == null);
     }
 }
