@@ -12,6 +12,7 @@ public class RegisterTests {
     private final UserDAO user;
     private final AuthDAO auth;
     private final UserService service;
+
     public RegisterTests() {
         user = new UserDataAccess();
         auth = new AuthDataAccess();
