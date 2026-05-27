@@ -7,27 +7,16 @@ import model.UserData;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class MySQLGameDataAccess implements GameDAO{
+import static dataaccess.DatabaseManager.configureDatabase;
 
-    public MySQLGameDataAccess() throws SQLException, DataAccessException {
-        configureDatabase();
-    }
+public class MySQLGameDataAccess implements GameDAO{
 
     private final String[] createStatements = {
 
     };
 
-    private void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createGameTable();
-        try (Connection conn = DatabaseManager.getConnection()){
-            for (String statement : createStatements){
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException("Unable to configure database");
-        }
+    public MySQLGameDataAccess() throws SQLException, DataAccessException {
+        configureDatabase(createStatements);
     }
 
     @Override

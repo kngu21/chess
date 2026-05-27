@@ -2,14 +2,9 @@ package dataaccess;
 
 import java.sql.*;
 import java.util.Properties;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
-import com.google.gson.Gson;
 
 public class DatabaseManager {
     private static String databaseName;
@@ -38,35 +33,18 @@ public class DatabaseManager {
         }
     }
 
-    static public void createAuthTable() throws DataAccessException {
-        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+    public static void configureDatabase(String[] createStatements) throws DataAccessException, SQLException {
+        try (Connection conn = DatabaseManager.getConnection()){
+            for (String statement : createStatements){
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
+            throw new DataAccessException("Unable to configure database");
         }
     }
 
-    static public void createUserTable() throws DataAccessException {
-        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
-        }
-    }
-
-    static public void createGameTable() throws DataAccessException {
-        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
-        }
-    }
 
     /**
      * Create a connection to the database and sets the catalog based upon the

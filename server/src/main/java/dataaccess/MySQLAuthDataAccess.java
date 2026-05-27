@@ -8,21 +8,20 @@ import java.sql.SQLException;
 public class MySQLAuthDataAccess implements AuthDAO{
 
     private final String[] createStatements = {
-
+            """ 
+              CREATE TABLE IF NOT EXISTS  auths (
+              `authToken` varchar(256) NOT NULL,
+              `username` varchar(128) NOT NULL,
+              PRIMARY KEY (`authToken`),
+              INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
     };
 
-    private void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createAuthTable();
-        try (Connection conn = DatabaseManager.getConnection()){
-            for (String statement : createStatements){
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException("Unable to configure database");
-        }
+    public MySQLAuthDataAccess() throws SQLException, DataAccessException {
+        DatabaseManager.configureDatabase(createStatements);
     }
+
 
     @Override
     public AuthData createAuth(String username) {

@@ -8,23 +8,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static dataaccess.DatabaseManager.configureDatabase;
+
 public class MySQLUserDataAccess implements UserDAO{
 
     private final String[] createStatements = {
 
     };
 
-    private void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createUserTable();
-        try (Connection conn = DatabaseManager.getConnection()){
-            for (String statement : createStatements){
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException("Unable to configure database");
-        }
+    public MySQLUserDataAccess() throws SQLException, DataAccessException {
+        configureDatabase(createStatements);
     }
 
     @Override

@@ -16,6 +16,11 @@ public class Server {
     private final VoidService voidService;
 
     public Server() {
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         AuthDAO auth = new AuthDataAccess();
         UserDAO user = new UserDataAccess();
         GameDAO game = new GameDataAccess();
@@ -23,11 +28,6 @@ public class Server {
         this.gameService = new GameService(game, auth);
         this.voidService = new VoidService(user, auth, game);
 
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
 
