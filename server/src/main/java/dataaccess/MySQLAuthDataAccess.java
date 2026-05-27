@@ -20,7 +20,7 @@ public class MySQLAuthDataAccess implements AuthDAO{
             """
     };
 
-    public MySQLAuthDataAccess() throws SQLException, DataAccessException {
+    public MySQLAuthDataAccess() throws DataAccessException, SQLException {
         DatabaseManager.configureDatabase(createStatements);
     }
 
@@ -30,10 +30,11 @@ public class MySQLAuthDataAccess implements AuthDAO{
         String newUUID = UUID.randomUUID().toString();
         AuthData newAuth = new AuthData(newUUID, username);
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT INTO auths (authToken, authData) VALUES (newUUID, newAuth)";
+            var statement = "INSERT INTO auths (authToken, authData) VALUES (?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 String json = new Gson().toJson(newAuth);
-                ps.setString(1, json);
+                ps.setString(1, newUUID);
+                ps.setString(2, json);
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
