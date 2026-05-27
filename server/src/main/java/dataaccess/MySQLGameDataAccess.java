@@ -9,11 +9,10 @@ import static dataaccess.DatabaseManager.configureDatabase;
 
 public class MySQLGameDataAccess implements GameDAO{
 
-    private int gameID;
     private String[] createStatements = {
             """ 
               CREATE TABLE IF NOT EXISTS  games (
-              `gameID` int NOT NULL,
+              `gameID` int NOT NULL, AUTO_INCREMENT,
               `whiteUsername` varchar(128) NOT NULL,
               `blackUsername` varchar(128) NOT NULL,
               `gameName` varchar(128) NOT NULL,
@@ -24,29 +23,33 @@ public class MySQLGameDataAccess implements GameDAO{
     };
 
     public MySQLGameDataAccess() throws SQLException, DataAccessException {
-        this.gameID = 1;
         configureDatabase(createStatements);
     }
 
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
-        GameData newGame = new GameData(gameID, null, null, gameName, game);
+        String json = new Gson().toJson(game);
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT INTO users (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                ps.setString(2, null);
-                ps.setString(3, null);
-                ps.setString(4, gameName);
-                ps.setString(5, new Gson().toJson(game));
+            var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setNull(1, Types.VARCHAR);
+                ps.setNull(2, Types.VARCHAR);
+                ps.setString(3, gameName);
+                ps.setString(4, json);
                 ps.executeUpdate();
-                gameID++;
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if(rs.next()){
+                        int gameID = rs.getInt(1);
+                        return new GameData(gameID, null, null, gameName, game);
+                    }
+                }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to insert userData");
+            throw new DataAccessException("Unable to create gameData");
         }
-        return newGame;
+        return null;
     }
 
     @Override
@@ -62,7 +65,6 @@ public class MySQLGameDataAccess implements GameDAO{
                     }
                 }
             }
-
         } catch (SQLException e) {
             throw new DataAccessException("Unable to get gameData");
         }
@@ -70,13 +72,42 @@ public class MySQLGameDataAccess implements GameDAO{
     }
 
     @Override
-    public ArrayList<GameData> listGames() {
-        return null;
+    public ArrayList<GameData> listGames() throws DataAccessException {
+        ArrayList<GameData> games = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int id = rs.getInt("gameID");
+                    String white = rs.getString("whiteUsername");
+                    String black = rs.getString("blackUsername");
+                    String name = rs.getString("gameName");
+                    ChessGame game = new Gson().fromJson(rs.getString("chessGame"), ChessGame.class);
+                    games.add(new GameData(id, white, black, name, game));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to replace game");
+        }
+        return games;
     }
 
     @Override
-    public void replaceGame(GameData newGame) {
-
+    public void replaceGame(GameData newGame) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, chessGame=? WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, newGame.whiteUsername());
+                ps.setString(2, newGame.blackUsername());
+                ps.setString(3, newGame.gameName());
+                ps.setString(4, new Gson().toJson(newGame));
+                ps.setInt(5, newGame.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to replace game");
+        }
     }
 
     @Override
