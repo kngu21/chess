@@ -1,8 +1,5 @@
 package service;
-import dataaccess.AuthDAO;
-import dataaccess.AuthDataAccess;
-import dataaccess.UserDAO;
-import dataaccess.UserDataAccess;
+import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -19,20 +16,20 @@ public class RegisterTests {
         service = new UserService(user, auth);
     }
     @Test
-    void testNewUser() throws AlreadyTakenException {
+    void testNewUser() throws AlreadyTakenException, DataAccessException {
         // Arrange
         UserData notTaken = new UserData("noOne", "oh yeah!", "email.com");
         service.register(notTaken);
          assertNotNull(user.getUser("noOne"));
     }
     @Test
-    void testExistingUser(){
+    void testExistingUser() throws DataAccessException {
         user.createUser(new UserData("kngu21", "oh yeah!", "email.com"));
         UserData taken = new UserData("kngu21", "oh yeah!", "email.com");
         assertThrows(AlreadyTakenException.class, () -> service.register(taken));
     }
     @Test
-    void testAuthToken(){
+    void testAuthToken() throws DataAccessException {
         auth.createAuth("kngu21");
     }
 }

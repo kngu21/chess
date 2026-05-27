@@ -1,6 +1,5 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.AuthData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +13,7 @@ public class MySQLAuthDataAccess implements AuthDAO{
             """ 
               CREATE TABLE IF NOT EXISTS  auths (
               `authToken` varchar(256) NOT NULL,
-              `authData` TEXT NOT NULL,
+              `username` varchar(128) NOT NULL,
               PRIMARY KEY (`authToken`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
@@ -30,28 +29,27 @@ public class MySQLAuthDataAccess implements AuthDAO{
         String newUUID = UUID.randomUUID().toString();
         AuthData newAuth = new AuthData(newUUID, username);
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT INTO auths (authToken, authData) VALUES (?, ?)";
+            var statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                String json = new Gson().toJson(newAuth);
                 ps.setString(1, newUUID);
-                ps.setString(2, json);
+                ps.setString(2, username);
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Unable to insert authData");
         }
-        return null;
+        return newAuth;
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT authData FROM auths WHERE authToken=?";
+            var statement = "SELECT username FROM auths WHERE authToken=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (ResultSet rs = ps.executeQuery()){
                     if(rs.next()){
-                        return readAuth(rs);
+                        return new AuthData(authToken, rs.getString("username"));
                     }
                 }
             }
@@ -60,11 +58,6 @@ public class MySQLAuthDataAccess implements AuthDAO{
             throw new DataAccessException("Unable to get authData");
         }
         return null;
-    }
-
-    private AuthData readAuth(ResultSet rs) throws SQLException {
-        var json = rs.getString("authData");
-        return new Gson().fromJson(json, AuthData.class);
     }
 
     @Override
@@ -82,16 +75,14 @@ public class MySQLAuthDataAccess implements AuthDAO{
     }
 
     @Override
-    public void clear() throws DataAccessException, SQLException {
+    public void clear() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "DROP TABLE auths";
+            var statement = "TRUNCATE TABLE auths";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.executeUpdate();
             }
-
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to remove table auths");
+            throw new DataAccessException("Unable to clear table auths");
         }
-        DatabaseManager.configureDatabase(createStatements);
     }
 }

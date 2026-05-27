@@ -20,7 +20,7 @@ public class JoinGameTests {
         service2 = new UserService(user, auth);
 }
     @Test
-    void testCorrect() throws AlreadyTakenException {
+    void testCorrect() throws AlreadyTakenException, DataAccessException {
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);
 
@@ -45,7 +45,7 @@ public class JoinGameTests {
         assertNull(game2.whiteUsername());
     }
     @Test
-    void testIncorrect() throws AlreadyTakenException {
+    void testIncorrect() throws AlreadyTakenException, DataAccessException {
         // Arrange
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);

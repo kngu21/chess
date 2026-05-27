@@ -44,12 +44,13 @@ public class Server {
     private void registerUser(Context context) {
         try {
             RegisterHandler.RegisterRequest body = new Gson().fromJson(context.body(), RegisterHandler.RegisterRequest.class);
-            RegisterHandler reggie = new RegisterHandler(context, userService);
             if (body == null || body.username() == null || body.password() == null || body.email() == null) {
                 context.status(400).result(new Gson().toJson(Map.of("message", "Error: bad request")));
                 return;
             }
-            context.result(new Gson().toJson(reggie.result()));
+            RegisterHandler reggie = new RegisterHandler(context, userService);
+            var result = reggie.result();
+            context.result(new Gson().toJson(result));
             context.status(200);
         }
         catch(BadRequestException exception){
@@ -57,8 +58,9 @@ public class Server {
         }
         catch(AlreadyTakenException exception){
             context.status(403).result(new Gson().toJson(Map.of("message","Error: already taken")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -79,8 +81,9 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -92,8 +95,9 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -106,8 +110,9 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -127,8 +132,9 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -146,8 +152,9 @@ public class Server {
         }
         catch(AlreadyTakenException exception){
             context.status(403).result(new Gson().toJson(Map.of("message", "Error: already taken")));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            context.status(500).result(new Gson().toJson(Map.of("message","Error: trouble accessing database")));
         }
     }
 
@@ -156,7 +163,7 @@ public class Server {
             voidService.clear();
             context.status(200).result("{}");
         }
-        catch(DataAccessException exception){
+        catch(DataAccessException e){
             context.status(500).result(new Gson().toJson(Map.of("message", "Error accessing data")));
         } catch (SQLException e) {
             throw new RuntimeException(e);

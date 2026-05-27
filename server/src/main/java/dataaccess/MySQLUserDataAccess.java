@@ -1,6 +1,5 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.UserData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +14,8 @@ public class MySQLUserDataAccess implements UserDAO{
             """ 
               CREATE TABLE IF NOT EXISTS  users (
               `username` varchar(128) NOT NULL,
-              `userData` TEXT NOT NULL,
+              `password` varchar(128) NOT NULL,
+              `email` varchar(128) NOT NULL,
               PRIMARY KEY (`username`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
@@ -28,12 +28,12 @@ public class MySQLUserDataAccess implements UserDAO{
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT userData FROM users WHERE username=?";
+            var statement = "SELECT password, email FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()){
                     if(rs.next()){
-                        return readUser(rs);
+                        return new UserData(username, rs.getString("password"), rs.getString("email"));
                     }
                 }
             }
@@ -44,19 +44,14 @@ public class MySQLUserDataAccess implements UserDAO{
         return null;
     }
 
-    private UserData readUser(ResultSet rs) throws SQLException {
-        var json = rs.getString("userData");
-        return new Gson().fromJson(json, UserData.class);
-    }
-
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT INTO users (username, userData) VALUES (?, ?)";
+            var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                String json = new Gson().toJson(userData);
                 ps.setString(1, userData.username());
-                ps.setString(2, json);
+                ps.setString(2, userData.password());
+                ps.setString(3, userData.email());
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
@@ -67,14 +62,12 @@ public class MySQLUserDataAccess implements UserDAO{
     @Override
     public void clear() throws SQLException, DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "DROP TABLE users";
+            var statement = "TRUNCATE TABLE users";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.executeUpdate();
             }
-
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to remove table users");
+            throw new DataAccessException("Unable to clear table users");
         }
-        DatabaseManager.configureDatabase(createStatements);
     }
 }

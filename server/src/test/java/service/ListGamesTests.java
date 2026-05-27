@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ListGamesTests extends BaseTest{
     @Test
-    void testCorrect() throws AlreadyTakenException {
+    void testCorrect() throws AlreadyTakenException, DataAccessException {
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);
 
@@ -21,7 +21,7 @@ public class ListGamesTests extends BaseTest{
         assertEquals(1, result.games().size());
     }
     @Test
-    void incorrectTest() throws AlreadyTakenException {
+    void incorrectTest() throws AlreadyTakenException, DataAccessException {
         UserData user = new UserData("noOne", "oh yeah!", "email.com");
         service2.register(user);
 

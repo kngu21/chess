@@ -1,5 +1,7 @@
 package dataaccess;
 import model.GameData;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface GameDAO {
@@ -7,5 +9,5 @@ public interface GameDAO {
     GameData getGame(int gameID);
     ArrayList<GameData> listGames();
     void replaceGame(GameData newGame);
-    void clear();
+    void clear() throws SQLException, DataAccessException;
 }

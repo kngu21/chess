@@ -7,23 +7,17 @@ import static dataaccess.DatabaseManager.configureDatabase;
 
 public class MySQLGameDataAccess implements GameDAO{
 
-    public MySQLGameDataAccess() throws SQLException, DataAccessException {
-        String[] createStatements = {
-                """ 
+    private String[] createStatements = {
+            """ 
               CREATE TABLE IF NOT EXISTS  games (
               `gameID` int NOT NULL AUTO_INCREMENT,
-              `whiteUsername` varchar(128) NOT NULL,
-              `blackUsername` varchar(128) NOT NULL,
-              `gameName` varchar(128) NOT NULL,
-              `chessGame` varchar(256) NOT NULL,
-              PRIMARY KEY (`gameID`),
-              INDEX(whiteUsername),
-              INDEX(blackUsername),
-              INDEX(gameName),
-              INDEX(chessGame)
+              `gameData` TEXT NOT NULL,
+              PRIMARY KEY (`gameID`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
-        };
+    };
+
+    public MySQLGameDataAccess() throws SQLException, DataAccessException {
         configureDatabase(createStatements);
     }
 
@@ -48,7 +42,16 @@ public class MySQLGameDataAccess implements GameDAO{
     }
 
     @Override
-    public void clear() {
+    public void clear() throws SQLException, DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "DROP TABLE games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
 
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to remove table games");
+        }
+        DatabaseManager.configureDatabase(createStatements);
     }
 }
