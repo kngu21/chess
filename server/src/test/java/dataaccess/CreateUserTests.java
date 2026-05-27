@@ -11,7 +11,8 @@ public class CreateUserTests extends BaseTest{
     void successfulCreateUser() throws DataAccessException {
         service2.register(new UserData("jim", "howdy", "cool@email.com"));
         assertDoesNotThrow(() ->{
-            service2.login("jim", "howdy");
+            var login = service2.login("jim", "howdy");
+            service2.logout(login.authToken());
         });
     }
     @Test
