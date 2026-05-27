@@ -1,4 +1,5 @@
 package handlers;
+import dataaccess.DataAccessException;
 import service.BadRequestException;
 import service.UserService;
 import com.google.gson.Gson;
@@ -16,7 +17,7 @@ public class LoginHandler {
         this.service = service;
     }
 
-    public LoginResult result() throws BadRequestException {
+    public LoginResult result() throws BadRequestException, DataAccessException {
         LoginHandler.LoginRequest body = new Gson().fromJson(text.body(), LoginHandler.LoginRequest.class);
         return service.login(body.username(), body.password());
     }

@@ -1,4 +1,5 @@
 package handlers;
+import dataaccess.DataAccessException;
 import service.AlreadyTakenException;
 import service.UserService;
 import com.google.gson.Gson;
@@ -17,7 +18,7 @@ public class RegisterHandler {
         this.service = service;
     }
 
-    public RegisterResult result() throws AlreadyTakenException {
+    public RegisterResult result() throws AlreadyTakenException, DataAccessException {
         RegisterHandler.RegisterRequest body = new Gson().fromJson(text.body(), RegisterHandler.RegisterRequest.class);
         return service.register(new UserData(body.username(), body.password(), body.email));
     }

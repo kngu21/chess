@@ -6,6 +6,7 @@ import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 public class Server {
@@ -18,15 +19,15 @@ public class Server {
     public Server() {
         try {
             DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
+            AuthDAO auth = new MySQLAuthDataAccess();
+            UserDAO user = new MySQLUserDataAccess();
+            GameDAO game = new MySQLGameDataAccess();
+            this.userService = new UserService(user, auth);
+            this.gameService = new GameService(game, auth);
+            this.voidService = new VoidService(user, auth, game);
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-        AuthDAO auth = new AuthDataAccess();
-        UserDAO user = new UserDataAccess();
-        GameDAO game = new GameDataAccess();
-        this.userService = new UserService(user, auth);
-        this.gameService = new GameService(game, auth);
-        this.voidService = new VoidService(user, auth, game);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
@@ -56,6 +57,8 @@ public class Server {
         }
         catch(AlreadyTakenException exception){
             context.status(403).result(new Gson().toJson(Map.of("message","Error: already taken")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -76,6 +79,8 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

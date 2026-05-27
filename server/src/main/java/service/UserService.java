@@ -1,4 +1,5 @@
 package service;
+import dataaccess.DataAccessException;
 import handlers.LoginHandler;
 import handlers.RegisterHandler;
 import dataaccess.AuthDAO;
@@ -14,7 +15,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterHandler.RegisterResult register(UserData request) throws AlreadyTakenException {
+    public RegisterHandler.RegisterResult register(UserData request) throws AlreadyTakenException, DataAccessException {
         UserData exists = userDAO.getUser(request.username());
         if(exists != null){
             throw new AlreadyTakenException();
@@ -25,7 +26,7 @@ public class UserService {
         return new RegisterHandler.RegisterResult(request.username(), newData.authToken());
     }
 
-    public LoginHandler.LoginResult login(String username, String password) throws BadRequestException {
+    public LoginHandler.LoginResult login(String username, String password) throws BadRequestException, DataAccessException {
         UserData exists = userDAO.getUser(username);
         if(exists == null){
             throw new UnauthorizedException("Unauthorized");

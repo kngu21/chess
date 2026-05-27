@@ -11,11 +11,23 @@ import static dataaccess.DatabaseManager.configureDatabase;
 
 public class MySQLGameDataAccess implements GameDAO{
 
-    private final String[] createStatements = {
-
-    };
-
     public MySQLGameDataAccess() throws SQLException, DataAccessException {
+        String[] createStatements = {
+                """ 
+              CREATE TABLE IF NOT EXISTS  games (
+              `gameID` int NOT NULL AUTO_INCREMENT,
+              `whiteUsername` varchar(128) NOT NULL,
+              `blackUsername` varchar(128) NOT NULL,
+              `gameName` varchar(128) NOT NULL,
+              `chessGame` varchar(256) NOT NULL,
+              PRIMARY KEY (`gameID`),
+              INDEX(whiteUsername),
+              INDEX(blackUsername),
+              INDEX(gameName),
+              INDEX(chessGame)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+        };
         configureDatabase(createStatements);
     }
 

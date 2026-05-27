@@ -12,11 +12,19 @@ import static dataaccess.DatabaseManager.configureDatabase;
 
 public class MySQLUserDataAccess implements UserDAO{
 
-    private final String[] createStatements = {
-
-    };
-
     public MySQLUserDataAccess() throws SQLException, DataAccessException {
+        String[] createStatements = {
+                """ 
+              CREATE TABLE IF NOT EXISTS  users (
+              `username` varchar(128) NOT NULL,
+              `password` varchar(256) NOT NULL,
+              `email` varchar(128) NOT NULL,
+              PRIMARY KEY (`username`),
+              INDEX(password),
+              INDEX(email)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+        };
         configureDatabase(createStatements);
     }
 
