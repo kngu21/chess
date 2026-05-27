@@ -38,7 +38,7 @@ public class UserService {
         return new LoginHandler.LoginResult(username, newData.authToken());
     }
 
-    public void logout(String authToken){
+    public void logout(String authToken) throws DataAccessException {
         AuthData exists = authDAO.getAuth(authToken);
         if(exists == null){
             throw new UnauthorizedException("Unauthorized");

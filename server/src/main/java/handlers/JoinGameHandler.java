@@ -1,5 +1,6 @@
 package handlers;
 
+import dataaccess.DataAccessException;
 import service.AlreadyTakenException;
 import service.GameService;
 import service.UnauthorizedException;
@@ -17,7 +18,7 @@ public class JoinGameHandler {
         this.service = service;
     }
 
-    public void result() throws UnauthorizedException, AlreadyTakenException {
+    public void result() throws UnauthorizedException, AlreadyTakenException, DataAccessException {
         JoinGameHandler.JoinGameRequest body = new Gson().fromJson(text.body(), JoinGameHandler.JoinGameRequest.class);
         String auth = text.header("authorization");
         service.joinGame(auth, body.playerColor(), body.gameID());

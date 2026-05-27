@@ -1,4 +1,5 @@
 package handlers;
+import dataaccess.DataAccessException;
 import service.GameService;
 import service.UnauthorizedException;
 import com.google.gson.Gson;
@@ -16,7 +17,7 @@ public class CreateGameHandler {
         this.service = service;
     }
 
-    public CreateGameResult result() throws UnauthorizedException {
+    public CreateGameResult result() throws UnauthorizedException, DataAccessException {
         CreateGameHandler.CreateGameRequest body = new Gson().fromJson(text.body(), CreateGameHandler.CreateGameRequest.class);
         String auth = text.header("authorization");
         return service.createGame(auth, body.gameName());

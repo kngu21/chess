@@ -92,6 +92,8 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -104,6 +106,8 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -123,6 +127,8 @@ public class Server {
         }
         catch(UnauthorizedException exception){
             context.status(401).result(new Gson().toJson(Map.of("message","Error: unauthorized")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -140,6 +146,8 @@ public class Server {
         }
         catch(AlreadyTakenException exception){
             context.status(403).result(new Gson().toJson(Map.of("message", "Error: already taken")));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -150,6 +158,8 @@ public class Server {
         }
         catch(DataAccessException exception){
             context.status(500).result(new Gson().toJson(Map.of("message", "Error accessing data")));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

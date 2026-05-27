@@ -7,6 +7,7 @@ import model.AuthData;
 import model.GameData;
 import model.GameInfo;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class VoidService {
@@ -18,13 +19,13 @@ public class VoidService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         userDAO.clear();
         authDAO.clear();
         gameDAO.clear();
     }
 
-    public ArrayList<GameInfo> listGames(String authToken) throws UnauthorizedException {
+    public ArrayList<GameInfo> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData data = authDAO.getAuth(authToken);
         if(data == null){
             throw new UnauthorizedException("Unauthorized");

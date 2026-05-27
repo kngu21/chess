@@ -1,4 +1,5 @@
 package handlers;
+import dataaccess.DataAccessException;
 import service.UnauthorizedException;
 import service.VoidService;
 import io.javalin.http.Context;
@@ -17,7 +18,7 @@ public class ListGamesHandler {
         this.service = service;
     }
 
-    public ListGamesHandler.ListGamesResult result() throws UnauthorizedException {
+    public ListGamesHandler.ListGamesResult result() throws UnauthorizedException, DataAccessException {
         String auth = text.header("authorization");
         ArrayList<GameInfo> games = service.listGames(auth);
         return new ListGamesResult(games);

@@ -1,4 +1,5 @@
 package service;
+import dataaccess.DataAccessException;
 import handlers.CreateGameHandler;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -14,7 +15,7 @@ public class GameService {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
-    public CreateGameHandler.CreateGameResult createGame(String authToken, String gameName) throws UnauthorizedException{
+    public CreateGameHandler.CreateGameResult createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
         AuthData exists = authDAO.getAuth(authToken);
         if(exists == null){
             throw new UnauthorizedException("Unauthorized");
@@ -23,7 +24,7 @@ public class GameService {
         return new CreateGameHandler.CreateGameResult(data.gameID(), data.whiteUsername(), data.blackUsername(), gameName);
     }
 
-    public void joinGame(String authToken, String playerColor, int gameID) throws AlreadyTakenException {
+    public void joinGame(String authToken, String playerColor, int gameID) throws AlreadyTakenException, DataAccessException {
         AuthData exists = authDAO.getAuth(authToken);
         if(exists == null){
             throw new UnauthorizedException("Unauthorized");
