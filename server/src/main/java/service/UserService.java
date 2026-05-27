@@ -6,6 +6,7 @@ import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final UserDAO userDAO;
@@ -31,7 +32,7 @@ public class UserService {
         if(exists == null){
             throw new UnauthorizedException("Unauthorized");
         }
-        if(!exists.password().equals(password)){
+        if(!(BCrypt.checkpw(password, exists.password()))){
             throw new UnauthorizedException("Unauthorized");
         }
         AuthData newData = authDAO.createAuth(username);

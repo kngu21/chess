@@ -12,9 +12,9 @@ public class MySQLGameDataAccess implements GameDAO{
     private String[] createStatements = {
             """ 
               CREATE TABLE IF NOT EXISTS  games (
-              `gameID` int NOT NULL, AUTO_INCREMENT,
-              `whiteUsername` varchar(128) NOT NULL,
-              `blackUsername` varchar(128) NOT NULL,
+              `gameID` int NOT NULL AUTO_INCREMENT,
+              `whiteUsername` varchar(128),
+              `blackUsername` varchar(128),
               `gameName` varchar(128) NOT NULL,
               `chessGame` TEXT NOT NULL,
               PRIMARY KEY (`gameID`)
@@ -88,7 +88,7 @@ public class MySQLGameDataAccess implements GameDAO{
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to replace game");
+            throw new DataAccessException("Unable to list games");
         }
         return games;
     }

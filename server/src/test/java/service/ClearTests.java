@@ -3,6 +3,8 @@ import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 public class ClearTests {
     private final UserDAO user;
     private final AuthDAO auth;
@@ -16,7 +18,7 @@ public class ClearTests {
         service = new VoidService(user, auth, game);
     }
     @Test
-    void testNewUser() throws DataAccessException {
+    void testNewUser() throws DataAccessException, SQLException {
         // Arrange
         user.createUser(new UserData("kngu21", "oh yeah!", "email.com"));
         auth.createAuth("kngu21");
