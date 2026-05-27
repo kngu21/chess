@@ -1,15 +1,9 @@
 package dataaccess;
 
-import chess.ChessGame;
-import model.GameData;
-import model.GameInfo;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import service.AlreadyTakenException;
-import service.UnauthorizedException;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 

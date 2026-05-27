@@ -2,7 +2,6 @@ package dataaccess;
 
 import model.UserData;
 import org.junit.jupiter.api.Test;
-import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
 import static org.junit.jupiter.api.Assertions.*;

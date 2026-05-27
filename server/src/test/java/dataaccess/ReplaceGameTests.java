@@ -5,7 +5,6 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import service.AlreadyTakenException;
-import service.UnauthorizedException;
 
 import java.sql.SQLException;
 

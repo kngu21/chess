@@ -12,7 +12,8 @@ public class GetAuthTests extends BaseTest{
     void successfulGetAuth() throws DataAccessException {
         service2.register(new UserData("kai", "password", "cool@email.com"));
         assertDoesNotThrow(() ->{
-            service2.login("kai", "password");
+            var loginResult = service2.login("kai", "password");
+            service2.logout(loginResult.authToken());
         });
     }
     @Test
@@ -20,7 +21,8 @@ public class GetAuthTests extends BaseTest{
         service2.register(new UserData("kai", "password", "cool@email.com"));
 
         assertThrows(UnauthorizedException.class, () -> {
-            service2.login("kai", "passWord");
+            var loginResult = service2.login("kai", "password");
+            service2.logout(loginResult.authToken() + "i");
         });
     }
 }

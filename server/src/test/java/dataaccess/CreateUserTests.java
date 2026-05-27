@@ -8,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateUserTests extends BaseTest{
     @Test
-    void successfulCreateAuth() throws DataAccessException {
+    void successfulCreateUser() throws DataAccessException {
         service2.register(new UserData("jim", "howdy", "cool@email.com"));
         assertDoesNotThrow(() ->{
             service2.login("jim", "howdy");
         });
     }
     @Test
-    void failedCreateAuth() throws AlreadyTakenException, DataAccessException {
+    void failedCreateUser() throws AlreadyTakenException, DataAccessException {
         service2.register(new UserData("kai", "password", "cool@email.com"));
 
         assertThrows(AlreadyTakenException.class, () -> {
