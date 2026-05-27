@@ -1,8 +1,11 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.UserData;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLUserDataAccess implements UserDAO{
@@ -12,7 +15,7 @@ public class MySQLUserDataAccess implements UserDAO{
     };
 
     private void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
+        DatabaseManager.createUserTable();
         try (Connection conn = DatabaseManager.getConnection()){
             for (String statement : createStatements){
                 try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -25,8 +28,27 @@ public class MySQLUserDataAccess implements UserDAO{
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, json FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()){
+                    if(rs.next()){
+                        return readUser(rs);
+                    }
+                }
+            }
+
+        } catch (DataAccessException | SQLException e) {
+            throw new DataAccessException("");
+        }
         return null;
+    }
+
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var json = rs.getString("json");
+        return new Gson().fromJson(json, UserData.class);
     }
 
     @Override
@@ -36,6 +58,7 @@ public class MySQLUserDataAccess implements UserDAO{
 
     @Override
     public void clear() {
+        var statement = "TRUNCATE users";
 
     }
 }

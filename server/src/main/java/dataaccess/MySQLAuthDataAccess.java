@@ -12,7 +12,7 @@ public class MySQLAuthDataAccess implements AuthDAO{
     };
 
     private void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
+        DatabaseManager.createAuthTable();
         try (Connection conn = DatabaseManager.getConnection()){
             for (String statement : createStatements){
                 try (var preparedStatement = conn.prepareStatement(statement)) {

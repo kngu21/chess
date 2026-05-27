@@ -22,6 +22,12 @@ public class Server {
         this.userService = new UserService(user, auth);
         this.gameService = new GameService(game, auth);
         this.voidService = new VoidService(user, auth, game);
+
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
 
