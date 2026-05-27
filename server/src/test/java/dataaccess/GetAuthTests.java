@@ -11,18 +11,18 @@ public class GetAuthTests extends BaseTest{
     @Test
     void successfulGetAuth() throws DataAccessException {
         service2.register(new UserData("kai", "password", "cool@email.com"));
+        var login = service2.login("kai", "password");
         assertDoesNotThrow(() ->{
-            var loginResult = service2.login("kai", "password");
-            service2.logout(loginResult.authToken());
+            service.createGame(login.authToken(), "The Best Game");
         });
     }
     @Test
     void failedGetAuth() throws AlreadyTakenException, DataAccessException {
         service2.register(new UserData("kai", "password", "cool@email.com"));
-
+        var loginResult = service2.login("kai", "password");
+        var authData = auth.getAuth(loginResult.authToken());
         assertThrows(UnauthorizedException.class, () -> {
-            var loginResult = service2.login("kai", "password");
-            service2.logout(loginResult.authToken() + "i");
+            service2.logout(authData.authToken()+1);
         });
     }
 }
