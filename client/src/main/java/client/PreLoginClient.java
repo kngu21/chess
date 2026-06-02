@@ -5,6 +5,8 @@ import service.BadRequestException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+
 public class PreLoginClient {
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
@@ -31,7 +33,7 @@ public class PreLoginClient {
     }
 
     public void printPrompt(){
-        System.out.println("\n"+"[LOGGED_OUT] >>> ");
+        System.out.print("\n"+"[LOGGED_OUT] >>> ");
     }
 
     public String eval(String input){
@@ -50,12 +52,12 @@ public class PreLoginClient {
         }
     }
     public String logIn(String [] params){
-
+        return null;
     }
     public String register(String [] params){
-
+        return null;
     }
     public String help(){
-
+        return null;
     }
 }
