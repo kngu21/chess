@@ -5,7 +5,7 @@ import service.BadRequestException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+import static ui.EscapeSequences.*;
 
 public class PreLoginClient {
     private final ServerFacade server;
@@ -33,7 +33,7 @@ public class PreLoginClient {
     }
 
     public void printPrompt(){
-        System.out.print("\n"+"[LOGGED_OUT] >>> ");
+        System.out.print(SET_TEXT_COLOR_WHITE + "\n"+"[LOGGED_OUT] >>> ");
     }
 
     public String eval(String input){
@@ -45,7 +45,8 @@ public class PreLoginClient {
                 case "login" -> logIn(params);
                 case "register" -> register(params);
                 case "quit" -> "quit";
-                default -> help();
+                case "help" -> help();
+                default -> "unknown command";
             };
         } catch (BadRequestException ex) {
             return ex.getMessage();
@@ -58,6 +59,9 @@ public class PreLoginClient {
         return null;
     }
     public String help(){
-        return null;
+        return SET_TEXT_COLOR_BLUE+"register <USERNAME> <PASSWORD> <EMAIL> " + SET_TEXT_COLOR_MAGENTA + "- to create an account\n" +
+                SET_TEXT_COLOR_BLUE+"login <USERNAME> <PASSWORD> " + SET_TEXT_COLOR_MAGENTA + "- to play chess\n" +
+                SET_TEXT_COLOR_BLUE+"quit " + SET_TEXT_COLOR_MAGENTA + "- playing chess\n" +
+                SET_TEXT_COLOR_BLUE+"help" + SET_TEXT_COLOR_MAGENTA + "- with possible commands\n";
     }
 }
