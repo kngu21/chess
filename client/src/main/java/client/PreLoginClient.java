@@ -1,8 +1,5 @@
 package client;
 
-import service.BadRequestException;
-
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -57,12 +54,12 @@ public class PreLoginClient {
                 case "help" -> help();
                 default -> "unknown command";
             };
-        } catch (BadRequestException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
 
-    public String login(String [] params){
+    public String login(String [] params) throws Exception {
         if (params.length < 2) return "Usage: login <username> <password>\n";
         try{boolean success = facade.login(params[0], params[1]);
             if (success){
@@ -72,12 +69,12 @@ public class PreLoginClient {
             else{
                 return "";
             }
-        } catch(BadRequestException | IOException | InterruptedException e){
-            throw new BadRequestException("incorrect input");
+        } catch(Exception e){
+            throw new Exception("incorrect input");
         }
     }
 
-    public String register(String [] params){
+    public String register(String [] params) throws Exception {
         if (params.length < 3) return "Usage: register <username> <password> <email>\n";
         try{boolean success = facade.register(params[0], params[1], params[2]);
             if (success){
@@ -87,8 +84,8 @@ public class PreLoginClient {
             else{
                 return "";
             }
-        } catch(BadRequestException | IOException | InterruptedException e){
-            throw new BadRequestException("incorrect input");
+        } catch(Exception e){
+            throw new Exception("incorrect input");
         }
     }
 

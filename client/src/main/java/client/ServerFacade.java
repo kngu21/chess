@@ -7,8 +7,6 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameInfo;
 import model.GameListData;
-import service.UnauthorizedException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -166,7 +164,7 @@ public class ServerFacade {
         if(Objects.equals(color, "WHITE")) {
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1));
+                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1);
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0) {
                         System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(8-i, j+1))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
@@ -181,7 +179,7 @@ public class ServerFacade {
         else if(Objects.equals(color, "BLACK")){
             borderRow(blackList);
             for(int i = 0; i < 8; i++) {
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1));
+                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1);
                 for (int j = 0; j < 8; j++) {
                     if((i+j) % 2 == 0){
                         System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,8-j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);

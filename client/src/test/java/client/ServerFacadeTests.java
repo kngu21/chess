@@ -19,8 +19,7 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() throws IOException, InterruptedException {
         server = new Server();
-        var desiredPort = 0;
-        var port = server.run(desiredPort);
+        var port = server.run(0);
         var serverURL = "http://localhost:" + port;
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade(serverURL);

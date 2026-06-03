@@ -1,9 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import service.BadRequestException;
-import service.UnauthorizedException;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -61,7 +58,7 @@ public class PostLoginClient {
                 case "help" -> help();
                 default -> "unknown command";
             };
-        } catch (BadRequestException | IOException | InterruptedException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
