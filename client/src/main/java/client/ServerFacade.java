@@ -100,11 +100,11 @@ public class ServerFacade {
     }
 
     public void borderRow(List<Character> list){
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + "   " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_BOLD+ String.format(" %s ", list.get(i)) + RESET_BG_COLOR);
+            System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ", list.get(i)) + RESET_BG_COLOR);
         }
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + "   " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         System.out.println();
     }
 
@@ -114,22 +114,22 @@ public class ServerFacade {
         }
         if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
             return switch (piece.getPieceType()){
-                case KING -> WHITE_KING;
-                case QUEEN -> WHITE_QUEEN;
-                case BISHOP -> WHITE_BISHOP;
-                case KNIGHT -> WHITE_KNIGHT;
-                case ROOK -> WHITE_ROOK;
-                case PAWN -> WHITE_PAWN;
+                case KING -> SET_TEXT_COLOR_WHITE +BLACK_KING;
+                case QUEEN -> SET_TEXT_COLOR_WHITE+BLACK_QUEEN;
+                case BISHOP -> SET_TEXT_COLOR_WHITE+ BLACK_BISHOP;
+                case KNIGHT -> SET_TEXT_COLOR_WHITE+ BLACK_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_WHITE+ BLACK_ROOK;
+                case PAWN -> SET_TEXT_COLOR_WHITE+BLACK_PAWN;
             };
         }
         else {
             return switch (piece.getPieceType()) {
-                case KING -> BLACK_KING;
-                case QUEEN -> BLACK_QUEEN;
-                case BISHOP -> BLACK_BISHOP;
-                case KNIGHT -> BLACK_KNIGHT;
-                case ROOK -> BLACK_ROOK;
-                case PAWN -> BLACK_PAWN;
+                case KING -> SET_TEXT_COLOR_BLACK + BLACK_KING;
+                case QUEEN -> SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
+                case BISHOP -> SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
+                case KNIGHT -> SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_BLACK + BLACK_ROOK;
+                case PAWN -> SET_TEXT_COLOR_BLACK + BLACK_PAWN;
             };
         }
     }
@@ -138,16 +138,16 @@ public class ServerFacade {
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         borderRow(whiteList);
         for(int i = 0; i < 8; i++) {
-            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s ", (i-8)*-1));
+            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i-8)*-1));
             for (int j = 0; j < 8; j++) {
                 if((i+j) % 2 == 0){
-                    System.out.print(SET_BG_COLOR_WHITE + String.format("%s",returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,j+1)))) + RESET_BG_COLOR);
+                    System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(-1*(i-8),-1*(j-8)))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
                 }
                 else{
-                    System.out.print(SET_BG_COLOR_BLACK + String.format("%s",returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,j+1)))) + RESET_BG_COLOR);
+                    System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(-1*(i-8),-1*(j-8)))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
                 }
             }
-            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s ", (i-8)*-1) + RESET_BG_COLOR + "\n");
+            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", (i-8)*-1) + RESET_BG_COLOR + "\n");
         }
         borderRow(whiteList);
     }
