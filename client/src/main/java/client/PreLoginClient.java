@@ -14,27 +14,31 @@ public class PreLoginClient {
     public PreLoginClient(String serverUrl){
         facade = new ServerFacade(serverUrl);
     }
+
     public void run(){
         System.out.println("♕ Welcome to 240 chess. Type Help to get started. ♕");
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")) {
+        while (true) {
             printPrompt();
             String line = scanner.nextLine();
             try {
                 result = eval(line);
+                if(result.equals("quit")){
+                    System.out.println();
+                    System.exit(0);
+                }
                 System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
             }
             if(state == State.LOGGEDIN){
-                new PostLoginClient().run();
+                new PostLoginClient(facade).run();
             }
             state = State.LOGGEDOUT;
         }
-        System.out.println();
     }
 
     public void printPrompt(){
@@ -63,7 +67,7 @@ public class PreLoginClient {
         try{boolean success = facade.login(params[0], params[1]);
             if (success){
                 state = State.LOGGEDIN;
-                return String.format("Logged in as %s", params[0]);
+                return String.format("Logged in as %s.", params[0]);
             }
             else{
                 return "";
@@ -78,7 +82,7 @@ public class PreLoginClient {
         try{boolean success = facade.register(params[0], params[1], params[2]);
             if (success){
                 state = State.LOGGEDIN;
-                return String.format("Logged in as %s", params[0]);
+                return String.format("Registered and logged in as %s.", params[0]);
             }
             else{
                 return "";

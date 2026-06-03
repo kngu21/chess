@@ -56,4 +56,10 @@ public class ServerFacade {
             return false;
         }
     }
+
+    public boolean logout() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).header("authorization", authToken).DELETE().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.statusCode() == 200;
+    }
 }

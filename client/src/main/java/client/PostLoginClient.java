@@ -2,6 +2,7 @@ package client;
 
 import service.BadRequestException;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -10,15 +11,26 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
 
 public class PostLoginClient {
+    private final ServerFacade facade;
+    public PostLoginClient(ServerFacade facade){
+        this.facade = facade;
+    }
+
     public void run(){
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")) {
+        while (true) {
             printPrompt();
             String line = scanner.nextLine();
             try {
                 result = eval(line);
-                System.out.print(result);
+                if (result.equals("Logged out.")) {
+                    System.out.print(result);
+                    break;
+                }
+                else if(result.equals("quit")){
+                    System.exit(0);
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -62,7 +74,17 @@ public class PostLoginClient {
     }
 
     public String logout(){
-        return "";
+        try{
+            boolean success = facade.logout();
+            if(success){
+                return "Logged out.";
+            }
+            else{
+                return "";
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String createGame(int gameID){
