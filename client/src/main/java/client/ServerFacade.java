@@ -15,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
@@ -161,36 +162,40 @@ public class ServerFacade {
     public void drawGame(ChessGame game, String color){
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
-        if(color == "white") {
+        if(Objects.equals(color, "WHITE")) {
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
                 System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1));
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0) {
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(-1 * (i - 8), -1 * (j - 8)))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(8-i, j+1))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
                     } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(-1 * (i - 8), -1 * (j - 8)))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(8-i, j+1))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
                     }
                 }
                 System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", (i - 8) * -1) + RESET_BG_COLOR + "\n");
             }
             borderRow(whiteList);
         }
-        else if(color == "black"){
+        else if(Objects.equals(color, "BLACK")){
             borderRow(blackList);
             for(int i = 0; i < 8; i++) {
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i));
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1));
                 for (int j = 0; j < 8; j++) {
                     if((i+j) % 2 == 0){
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(i,j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,8-j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
                     }
                     else{
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(i,j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,8-j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
                     }
                 }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i + RESET_BG_COLOR + "\n"));
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i+1) + RESET_BG_COLOR + "\n");
             }
             borderRow(blackList);
         }
+    }
+
+    public observeGame(){
+
     }
 }

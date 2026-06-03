@@ -4,6 +4,8 @@ import chess.ChessGame;
 import service.BadRequestException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -60,7 +62,7 @@ public class PostLoginClient {
                 case "help" -> help();
                 default -> "unknown command";
             };
-        } catch (BadRequestException ex) {
+        } catch (BadRequestException | IOException | InterruptedException ex) {
             return ex.getMessage();
         }
     }
@@ -112,18 +114,14 @@ public class PostLoginClient {
         }
     }
 
-    public ChessGame getGame(int gameID){
-
-    }
-
     public String joinGame(int gameID, String color) throws IOException, InterruptedException {
         if (facade.joinGame(gameID, color.toUpperCase())) {
             System.out.print("Joined game " + gameID + " as " + color);
-            ChessGame game = getGame(gameID);
-            if (game != null) {
-                facade.drawGame(game, color.toLowerCase());
-            }
+            System.out.println();
+            ChessGame game = new ChessGame();
+            facade.drawGame(game, color.toUpperCase());
         }
+        return "";
     }
 
     public String observeGame(int gameID){
