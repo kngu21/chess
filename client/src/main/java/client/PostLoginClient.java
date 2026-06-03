@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import service.BadRequestException;
 
 import java.io.IOException;
@@ -112,6 +113,7 @@ public class PostLoginClient {
     }
 
     public String joinGame(int gameID, String color){
+        facade.drawGame(new ChessGame(), color);
         return "";
     }
 
