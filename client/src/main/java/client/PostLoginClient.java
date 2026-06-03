@@ -51,7 +51,7 @@ public class PostLoginClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "logout" -> logout();
-                case "create" -> createGame(Integer.parseInt(params[0]));
+                case "create" -> createGame(params[0]);
                 case "list" -> listGames();
                 case "join" -> joinGame(Integer.parseInt(params[0]), params[1]);
                 case "observe" -> observeGame(Integer.parseInt(params[0]));
@@ -88,8 +88,18 @@ public class PostLoginClient {
         }
     }
 
-    public String createGame(int gameID){
-        return "";
+    public String createGame(String gameName){
+        try{
+            boolean success = facade.createGame(gameName);
+            if(success){
+                return "Created game.";
+            }
+            else{
+                return "";
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String listGames(){

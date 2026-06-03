@@ -84,4 +84,19 @@ public class ServerFacade {
         }
         return games.toString();
     }
+
+    public boolean createGame(String gameName) throws IOException, InterruptedException {
+        String json = """
+                {
+                "gameName": "%s"
+                }
+                """.formatted(gameName);
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).POST(HttpRequest.BodyPublishers.ofString(json)).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.statusCode() == 200;
+    }
+
+    public void drawGame(){
+
+    }
 }
