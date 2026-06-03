@@ -2,10 +2,9 @@ package client;
 
 import chess.ChessGame;
 import service.BadRequestException;
+import service.UnauthorizedException;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -124,7 +123,15 @@ public class PostLoginClient {
         return "";
     }
 
-    public String observeGame(int gameID){
+    public String observeGame(int gameID) throws IOException, InterruptedException {
+        if(facade.observeGame(gameID)){
+            System.out.print("Observing game " + gameID+ "\n");
+            ChessGame game = new ChessGame();
+            facade.drawGame(game, "WHITE");
+        }
+        else {
+            return "game not found";
+        }
         return "";
     }
 }

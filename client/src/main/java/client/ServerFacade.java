@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameInfo;
 import model.GameListData;
+import service.UnauthorizedException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -195,7 +196,15 @@ public class ServerFacade {
         }
     }
 
-    public observeGame(){
-
+    public boolean observeGame(int gameID) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        GameListData gameList = gson.fromJson(response.body(), GameListData.class);
+        for (GameInfo info : gameList.games()) {
+            if (info.gameID() == gameID) {
+                return true;
+            }
+        }
+        return false;
     }
 }
