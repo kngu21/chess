@@ -112,9 +112,18 @@ public class PostLoginClient {
         }
     }
 
-    public String joinGame(int gameID, String color){
-        facade.drawGame(new ChessGame(), color);
-        return "";
+    public ChessGame getGame(int gameID){
+
+    }
+
+    public String joinGame(int gameID, String color) throws IOException, InterruptedException {
+        if (facade.joinGame(gameID, color.toUpperCase())) {
+            System.out.print("Joined game " + gameID + " as " + color);
+            ChessGame game = getGame(gameID);
+            if (game != null) {
+                facade.drawGame(game, color.toLowerCase());
+            }
+        }
     }
 
     public String observeGame(int gameID){

@@ -99,6 +99,29 @@ public class ServerFacade {
         return response.statusCode() == 200;
     }
 
+    public boolean joinGame(int gameID, String color) throws IOException, InterruptedException {
+        String json = """
+            {
+                "gameID": %d,
+                "playerColor": "%s"
+            }
+            """.formatted(gameID, color);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken)
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 200) {
+            return true;
+        } else {
+            System.out.println(response.body());
+            return false;
+        }
+    }
+
     public void borderRow(List<Character> list){
         System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
@@ -134,21 +157,40 @@ public class ServerFacade {
         }
     }
 
+
     public void drawGame(ChessGame game, String color){
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
-        borderRow(whiteList);
-        for(int i = 0; i < 8; i++) {
-            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i-8)*-1));
-            for (int j = 0; j < 8; j++) {
-                if((i+j) % 2 == 0){
-                    System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(-1*(i-8),-1*(j-8)))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+        List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
+        if(color == "white") {
+            borderRow(whiteList);
+            for (int i = 0; i < 8; i++) {
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1));
+                for (int j = 0; j < 8; j++) {
+                    if ((i + j) % 2 == 0) {
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(-1 * (i - 8), -1 * (j - 8)))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                    } else {
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(-1 * (i - 8), -1 * (j - 8)))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                    }
                 }
-                else{
-                    System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(-1*(i-8),-1*(j-8)))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
-                }
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", (i - 8) * -1) + RESET_BG_COLOR + "\n");
             }
-            System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", (i-8)*-1) + RESET_BG_COLOR + "\n");
+            borderRow(whiteList);
         }
-        borderRow(whiteList);
+        else if(color == "black"){
+            borderRow(blackList);
+            for(int i = 0; i < 8; i++) {
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i));
+                for (int j = 0; j < 8; j++) {
+                    if((i+j) % 2 == 0){
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(i,j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                    }
+                    else{
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(i,j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                    }
+                }
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i + RESET_BG_COLOR + "\n"));
+            }
+            borderRow(blackList);
+        }
     }
 }
