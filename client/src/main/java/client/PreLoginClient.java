@@ -58,6 +58,7 @@ public class PreLoginClient {
         if (params.length < 2) return "Usage: login <username> <password>\n";
         try{boolean success = facade.login(params[0], params[1]);
             if (success){
+                state = State.LOGGEDIN;
                 return String.format("Logged in as %s", params[0]);
             }
             else{
@@ -69,7 +70,18 @@ public class PreLoginClient {
     }
 
     public String register(String [] params){
-        return null;
+        if (params.length < 3) return "Usage: register <username> <password> <email>\n";
+        try{boolean success = facade.register(params[0], params[1], params[2]);
+            if (success){
+                state = State.LOGGEDIN;
+                return String.format("Logged in as %s", params[0]);
+            }
+            else{
+                return "invalid input";
+            }
+        } catch(BadRequestException | IOException | InterruptedException e){
+            throw new BadRequestException("incorrect input");
+        }
     }
 
     public String help(){
