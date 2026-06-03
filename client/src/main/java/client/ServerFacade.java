@@ -1,8 +1,5 @@
 package client;
 
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameInfo;
@@ -12,11 +9,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import static ui.EscapeSequences.*;
 
 public class ServerFacade {
     private final String serverURL;
@@ -128,89 +120,6 @@ public class ServerFacade {
         } else {
             System.out.println(response.body());
             return false;
-        }
-    }
-
-    public void borderRow(List<Character> list){
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
-        for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ",
-                    list.get(i)) + RESET_BG_COLOR);
-        }
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
-        System.out.println();
-    }
-
-    public String returnPiece(ChessPiece piece){
-        if(piece == null){
-            return EMPTY;
-        }
-        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
-            return switch (piece.getPieceType()){
-                case KING -> SET_TEXT_COLOR_WHITE +BLACK_KING;
-                case QUEEN -> SET_TEXT_COLOR_WHITE+BLACK_QUEEN;
-                case BISHOP -> SET_TEXT_COLOR_WHITE+ BLACK_BISHOP;
-                case KNIGHT -> SET_TEXT_COLOR_WHITE+ BLACK_KNIGHT;
-                case ROOK -> SET_TEXT_COLOR_WHITE+ BLACK_ROOK;
-                case PAWN -> SET_TEXT_COLOR_WHITE+BLACK_PAWN;
-            };
-        }
-        else {
-            return switch (piece.getPieceType()) {
-                case KING -> SET_TEXT_COLOR_BLACK + BLACK_KING;
-                case QUEEN -> SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
-                case BISHOP -> SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
-                case KNIGHT -> SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
-                case ROOK -> SET_TEXT_COLOR_BLACK + BLACK_ROOK;
-                case PAWN -> SET_TEXT_COLOR_BLACK + BLACK_PAWN;
-            };
-        }
-    }
-
-
-    public void drawGame(ChessGame game, String color){
-        List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
-        List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
-        if(Objects.equals(color, "WHITE")) {
-            borderRow(whiteList);
-            for (int i = 0; i < 8; i++) {
-                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1);
-                for (int j = 0; j < 8; j++) {
-                    if ((i + j) % 2 == 0) {
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
-                                .getPiece(new ChessPosition(8-i, j+1)))
-                                + RESET_TEXT_COLOR + RESET_BG_COLOR);
-                    } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard()
-                                .getPiece(new ChessPosition(8-i, j+1)))
-                                + RESET_TEXT_COLOR + RESET_BG_COLOR);
-                    }
-                }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003",
-                        (i - 8) * -1) + RESET_BG_COLOR + "\n");
-            }
-            borderRow(whiteList);
-        }
-        else if(Objects.equals(color, "BLACK")){
-            borderRow(blackList);
-            for(int i = 0; i < 8; i++) {
-                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1);
-                for (int j = 0; j < 8; j++) {
-                    if((i+j) % 2 == 0){
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
-                                .getPiece(new ChessPosition(i+1,8-j)))
-                                + RESET_TEXT_COLOR+RESET_BG_COLOR);
-                    }
-                    else{
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard()
-                                .getPiece(new ChessPosition(i+1,8-j)))
-                                + RESET_TEXT_COLOR+RESET_BG_COLOR);
-                    }
-                }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i+1)
-                        + RESET_BG_COLOR + "\n");
-            }
-            borderRow(blackList);
         }
     }
 
