@@ -31,6 +31,7 @@ public class PostLoginClient {
                 else if(result.equals("quit")){
                     System.exit(0);
                 }
+                System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -92,7 +93,12 @@ public class PostLoginClient {
     }
 
     public String listGames(){
-        return "";
+        try{
+            return facade.listGames();
+
+        }catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String joinGame(int gameID, String color){

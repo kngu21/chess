@@ -1,12 +1,19 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import model.AuthData;
+import model.GameInfo;
+import model.GameListData;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerFacade {
     private final String serverURL;
@@ -61,5 +68,20 @@ public class ServerFacade {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).header("authorization", authToken).DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.statusCode() == 200;
+    }
+
+    public String listGames() throws IOException, InterruptedException {
+        StringBuilder games = new StringBuilder();
+        int i = 1;
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        GameListData gameList = gson.fromJson(response.body(), GameListData.class);
+        for(GameInfo info : gameList.games()){
+            String white = info.whiteUsername() == null ? "-" : info.whiteUsername();
+            String black = info.blackUsername() == null ? "-" : info.blackUsername();
+            games.append(i).append(String.format(". GameID: %s, WhiteUsername: %s, BlackUsername: %s, GameName: %s\n", info.gameID(), white, black, info.gameName()));
+            i++;
+        }
+        return games.toString();
     }
 }
