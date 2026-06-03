@@ -29,6 +29,10 @@ public class PreLoginClient {
                 var msg = e.toString();
                 System.out.print(msg);
             }
+            if(state == State.LOGGEDIN){
+                new PostLoginClient().run();
+            }
+            state = State.LOGGEDOUT;
         }
         System.out.println();
     }
@@ -62,7 +66,7 @@ public class PreLoginClient {
                 return String.format("Logged in as %s", params[0]);
             }
             else{
-                return "invalid input";
+                return "";
             }
         } catch(BadRequestException | IOException | InterruptedException e){
             throw new BadRequestException("incorrect input");
@@ -77,7 +81,7 @@ public class PreLoginClient {
                 return String.format("Logged in as %s", params[0]);
             }
             else{
-                return "invalid input";
+                return "";
             }
         } catch(BadRequestException | IOException | InterruptedException e){
             throw new BadRequestException("incorrect input");
