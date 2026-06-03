@@ -60,7 +60,9 @@ public class PreLoginClient {
     }
 
     public String login(String [] params) throws Exception {
-        if (params.length < 2) return "Usage: login <username> <password>\n";
+        if (params.length < 2) {
+            return "Usage: login <username> <password>\n";
+        }
         try{boolean success = facade.login(params[0], params[1]);
             if (success){
                 state = State.LOGGEDIN;
@@ -75,7 +77,9 @@ public class PreLoginClient {
     }
 
     public String register(String [] params) throws Exception {
-        if (params.length < 3) return "Usage: register <username> <password> <email>\n";
+        if (params.length < 3) {
+            return "Usage: register <username> <password> <email>\n";
+        }
         try{boolean success = facade.register(params[0], params[1], params[2]);
             if (success){
                 state = State.LOGGEDIN;

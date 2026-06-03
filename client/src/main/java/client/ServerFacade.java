@@ -33,7 +33,9 @@ public class ServerFacade {
                 "password": "%s"
                 }
                 """.formatted(username, password);
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(json)).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if(response.statusCode() == 200){
             AuthData authData = gson.fromJson(response.body(), AuthData.class);
@@ -54,7 +56,9 @@ public class ServerFacade {
                 "email": "%s"
                 }
                 """.formatted(username, password, email);
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/user")).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(json)).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/user"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if(response.statusCode() == 200){
             AuthData authData = gson.fromJson(response.body(), AuthData.class);
@@ -68,7 +72,8 @@ public class ServerFacade {
     }
 
     public boolean logout() throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).header("authorization", authToken).DELETE().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session"))
+                .header("authorization", authToken).DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.statusCode() == 200;
     }
@@ -76,13 +81,15 @@ public class ServerFacade {
     public String listGames() throws IOException, InterruptedException {
         StringBuilder games = new StringBuilder();
         int i = 1;
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         GameListData gameList = gson.fromJson(response.body(), GameListData.class);
         for(GameInfo info : gameList.games()){
             String white = info.whiteUsername() == null ? "-" : info.whiteUsername();
             String black = info.blackUsername() == null ? "-" : info.blackUsername();
-            games.append(i).append(String.format(". GameID: %s, WhiteUsername: %s, BlackUsername: %s, GameName: %s\n", info.gameID(), white, black, info.gameName()));
+            games.append(i).append(String.format(". GameID: %s, WhiteUsername: %s, BlackUsername: %s, GameName: %s\n",
+                    info.gameID(), white, black, info.gameName()));
             i++;
         }
         return games.toString();
@@ -94,7 +101,9 @@ public class ServerFacade {
                 "gameName": "%s"
                 }
                 """.formatted(gameName);
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).POST(HttpRequest.BodyPublishers.ofString(json)).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken)
+                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.statusCode() == 200;
     }
@@ -125,7 +134,8 @@ public class ServerFacade {
     public void borderRow(List<Character> list){
         System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ", list.get(i)) + RESET_BG_COLOR);
+            System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ",
+                    list.get(i)) + RESET_BG_COLOR);
         }
         System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         System.out.println();
@@ -167,12 +177,17 @@ public class ServerFacade {
                 System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1);
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0) {
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(8-i, j+1))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
+                                .getPiece(new ChessPosition(8-i, j+1)))
+                                + RESET_TEXT_COLOR + RESET_BG_COLOR);
                     } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(8-i, j+1))) + RESET_TEXT_COLOR + RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard()
+                                .getPiece(new ChessPosition(8-i, j+1)))
+                                + RESET_TEXT_COLOR + RESET_BG_COLOR);
                     }
                 }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", (i - 8) * -1) + RESET_BG_COLOR + "\n");
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003",
+                        (i - 8) * -1) + RESET_BG_COLOR + "\n");
             }
             borderRow(whiteList);
         }
@@ -182,20 +197,26 @@ public class ServerFacade {
                 System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1);
                 for (int j = 0; j < 8; j++) {
                     if((i+j) % 2 == 0){
-                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,8-j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
+                                .getPiece(new ChessPosition(i+1,8-j)))
+                                + RESET_TEXT_COLOR+RESET_BG_COLOR);
                     }
                     else{
-                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard().getPiece(new ChessPosition(i+1,8-j))) + RESET_TEXT_COLOR+RESET_BG_COLOR);
+                        System.out.print(SET_BG_COLOR_DARK_GREEN + returnPiece(game.getBoard()
+                                .getPiece(new ChessPosition(i+1,8-j)))
+                                + RESET_TEXT_COLOR+RESET_BG_COLOR);
                     }
                 }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i+1) + RESET_BG_COLOR + "\n");
+                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i+1)
+                        + RESET_BG_COLOR + "\n");
             }
             borderRow(blackList);
         }
     }
 
     public boolean observeGame(int gameID) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).header("authorization", authToken).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         GameListData gameList = gson.fromJson(response.body(), GameListData.class);
         for (GameInfo info : gameList.games()) {
