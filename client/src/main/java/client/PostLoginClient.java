@@ -3,6 +3,7 @@ package client;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import model.GameInfo;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,10 +53,31 @@ public class PostLoginClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "logout" -> logout();
-                case "create" -> createGame(params[0]);
+                case "create" -> {if(params.length == 0){yield "Usage: create <gameName>";} else{yield createGame(params[0]);}}
                 case "list" -> listGames();
-                case "join" -> joinGame(Integer.parseInt(params[0]), params[1]);
-                case "observe" -> observeGame(Integer.parseInt(params[0]));
+
+                case "join" -> {if(params.length < 2){
+                    yield "Usage: join <gameID> <color>";}
+                    List<GameInfo> games = facade.getGames().games();
+                    try{ Integer.parseInt(params[0]);
+                    } catch(NumberFormatException e){yield "invalid number, must be an integer";}
+                    if(Integer.parseInt(params[0]) <= 0 || Integer.parseInt(params[0]) > games.toArray().length){
+                        yield "invalid gameID";
+                    }
+                    yield joinGame(games.get(Integer.parseInt(params[0]) - 1).gameID(), params[1]);
+                }
+
+                case "observe" -> {if(params.length == 0){
+                    yield "Usage: observe <gameID>";}
+                    List<GameInfo> games = facade.getGames().games();
+                    try{ Integer.parseInt(params[0]);
+                    } catch(NumberFormatException e){yield "invalid number, must be an integer";}
+                    if(Integer.parseInt(params[0]) <= 0 || Integer.parseInt(params[0]) > games.toArray().length){
+                        yield "invalid gameID";
+                    }
+                    yield observeGame(facade.getGames().games().get(Integer.parseInt(params[0]) - 1).gameID());
+                }
+
                 case "quit" -> "quit";
                 case "help" -> help();
                 default -> "unknown command";
@@ -113,6 +135,9 @@ public class PostLoginClient {
     }
 
     public String joinGame(int gameID, String color) throws IOException, InterruptedException {
+        if(!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black")){
+            return "invalid color";
+        }
         if (facade.joinGame(gameID, color.toUpperCase())) {
             System.out.print("Joined game " + gameID + " as " + color);
             System.out.println();

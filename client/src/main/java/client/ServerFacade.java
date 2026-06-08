@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ServerFacade {
+    private GameListData allGames;
     private final String serverURL;
     private final HttpClient client = HttpClient.newHttpClient();
     private String authToken = null;
@@ -18,6 +19,10 @@ public class ServerFacade {
     public ServerFacade(String serverURL){
         this.serverURL = serverURL;
     }
+    public GameListData getGames(){
+        return allGames;
+    }
+
     public boolean login(String username, String password) throws IOException, InterruptedException {
         String json = """
                 {
@@ -34,8 +39,11 @@ public class ServerFacade {
             this.authToken = authData.authToken();
             return true;
         }
+        else if(response.statusCode() == 401){
+            System.out.print("invalid username or password");
+            return false;
+        }
         else {
-            System.out.println(response.body());
             return false;
         }
     }
@@ -58,7 +66,7 @@ public class ServerFacade {
             return true;
         }
         else {
-            System.out.println(response.body());
+            System.out.println("username already taken");
             return false;
         }
     }
@@ -77,11 +85,12 @@ public class ServerFacade {
                 .header("authorization", authToken).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         GameListData gameList = gson.fromJson(response.body(), GameListData.class);
+        allGames = gameList;
         for(GameInfo info : gameList.games()){
             String white = info.whiteUsername() == null ? "-" : info.whiteUsername();
             String black = info.blackUsername() == null ? "-" : info.blackUsername();
-            games.append(i).append(String.format(". GameID: %s, WhiteUsername: %s, BlackUsername: %s, GameName: %s\n",
-                    info.gameID(), white, black, info.gameName()));
+            games.append(i).append(String.format(". WhiteUsername: %s, BlackUsername: %s, GameName: %s\n",
+                    white, black, info.gameName()));
             i++;
         }
         return games.toString();
@@ -118,7 +127,7 @@ public class ServerFacade {
         if (response.statusCode() == 200) {
             return true;
         } else {
-            System.out.println(response.body());
+            System.out.println("color already taken");
             return false;
         }
     }
