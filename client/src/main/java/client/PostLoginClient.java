@@ -160,7 +160,7 @@ public class PostLoginClient {
         return "";
     }
 
-    public void borderRow(List<Character> list){
+    public static void borderRow(List<Character> list){
         System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
             System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ",
@@ -170,7 +170,7 @@ public class PostLoginClient {
         System.out.println();
     }
 
-    public String returnPiece(ChessPiece piece){
+    public static String returnPiece(ChessPiece piece){
         if(piece == null){
             return EMPTY;
         }
@@ -197,7 +197,7 @@ public class PostLoginClient {
     }
 
 
-    public void drawGame(ChessGame game, String color){
+    public static void drawGame(ChessGame game, String color){
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
         if(Objects.equals(color, "WHITE")) {

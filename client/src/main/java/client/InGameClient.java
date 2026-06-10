@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -24,7 +25,7 @@ public class InGameClient {
             String line = scanner.nextLine();
             try {
                 result = eval(line);
-                if(result.equals("quit")){
+                if(result.equals("leave")){
                     System.out.println();
                     System.exit(0);
                 }
@@ -64,18 +65,32 @@ public class InGameClient {
     }
 
     private String resign() {
-
+        System.out.print("Are you sure you want to resign? You will forfeit and the game will be over.");
+        System.out.print("Reply 'yes' or 'no'.");
+        Scanner scanner = new Scanner(System.in);
+        String cased = scanner.toString().toLowerCase();
+        String result = "";
+        while(true) {
+            if (cased.equals("yes")) {
+                 result = "You have resigned.";
+                 break;
+            } else if (cased.equals("no")) {
+                result = "Resignation cancelled, you may continue playing.";
+                break;
+            } else {
+                System.out.print("Invalid response");
+            }
+        }
+        return result;
     }
 
     private String move(){
 
     }
 
-    private String leave() {
-
-    }
-
     private String redraw() {
+        PostLoginClient.drawGame(game, game.getTeamTurn().toString());
+        return "Redrew current game board.";
     }
 
 
