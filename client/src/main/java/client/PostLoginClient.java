@@ -139,6 +139,7 @@ public class PostLoginClient {
             return "invalid color";
         }
         if (facade.joinGame(gameID, color.toUpperCase())) {
+
             System.out.print("Joined game " + gameID + " as " + color);
             System.out.println();
             ChessGame game = new ChessGame();

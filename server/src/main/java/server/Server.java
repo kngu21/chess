@@ -15,6 +15,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final VoidService voidService;
+    private final WebsocketHandler websocketHandler;
 
     public Server() {
         try {
@@ -25,6 +26,7 @@ public class Server {
             this.userService = new UserService(user, auth);
             this.gameService = new GameService(game, auth);
             this.voidService = new VoidService(user, auth, game);
+            websocketHandler = new WebsocketHandler();
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -39,6 +41,11 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(websocketHandler);
+            ws.onMessage(websocketHandler);
+            ws.onClose(websocketHandler);
+        });
     }
 
     private void registerUser(Context context) {
