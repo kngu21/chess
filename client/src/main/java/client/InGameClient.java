@@ -1,13 +1,10 @@
 package client;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
 import java.util.*;
 
-import static client.PostLoginClient.borderRow;
-import static client.PostLoginClient.returnPiece;
+import static client.PostLoginClient.*;
 import static java.lang.Character.getNumericValue;
 import static ui.EscapeSequences.*;
 
@@ -15,7 +12,7 @@ public class InGameClient {
     private final ChessGame game;
     private final ChessGame.TeamColor userColor;
 
-    public InGameClient(ServerFacade facade, ChessGame.TeamColor userColor, ChessGame game){
+    public InGameClient(ChessGame.TeamColor userColor, ChessGame game){
         this.userColor = userColor;
         this.game = game;
     }
@@ -54,9 +51,14 @@ public class InGameClient {
             return switch (cmd) {
                 case "help" -> help();
                 case "redraw" -> redraw();
-                case "move" -> move();
+                case "move" -> {if (params.length < 2) {
+                    yield "Usage: move <start> <end> [promotion]";}
+                    String promo = params.length >= 3 ? params[2] : null;
+                    yield move(params[0], params[1], promo);
+                }
                 case "resign" -> resign();
                 case"highlight" -> highlight(params[0]);
+                case "leave" -> "leave";
                 default -> "unknown command";
             };
         } catch (Exception ex) {
@@ -70,9 +72,8 @@ public class InGameClient {
             return "Invalid move notation, please try again.";
         }
         if(!Character.isAlphabetic(position.charAt(0)) || !Character.isDigit(position.charAt(1))){
-            result = "First character must be a letter and second character must be a digit.";
+            return "First character must be a letter and second character must be a digit.";
         }
-        else {
             int col = position.charAt(0) - 'a' + 1;
             int row = getNumericValue(position.charAt(1));
             ChessPosition start = new ChessPosition(row, col);
@@ -86,14 +87,13 @@ public class InGameClient {
                 }
             }
             printHighlighted(start);
-        }
         return result;
     }
 
     private void printHighlighted(ChessPosition position){
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
-        Collection<ChessMove> valids = game.validMoves(position);
+        Collection<ChessMove> valid = game.validMoves(position);
         if(Objects.equals(userColor, ChessGame.TeamColor.WHITE)) {
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
@@ -101,7 +101,7 @@ public class InGameClient {
                 for (int j = 0; j < 8; j++) {
                     ChessPosition square = new ChessPosition(8-i, j+1);
                     boolean isStart = square.equals(position);
-                    boolean isValid = valids.stream().anyMatch(m -> m.getEndPosition().equals(square));
+                    boolean isValid = valid.stream().anyMatch(m -> m.getEndPosition().equals(square));
                     String backGround;
                     if(isStart){
                         backGround = SET_BG_COLOR_MAGENTA;
@@ -134,7 +134,7 @@ public class InGameClient {
                 for (int j = 0; j < 8; j++) {
                     ChessPosition square = new ChessPosition(i+1, 8-j);
                     boolean isStart = square.equals(position);
-                    boolean isValid = valids.stream().anyMatch(m -> m.getEndPosition().equals(square));
+                    boolean isValid = valid.stream().anyMatch(m -> m.getEndPosition().equals(square));
                     String backGround;
                     if(isStart){
                         backGround = SET_BG_COLOR_MAGENTA;
@@ -182,18 +182,46 @@ public class InGameClient {
         return result;
     }
 
-    private String move(){
-        return "";
+    private String move(String start, String end, String promotionPiece) throws InvalidMoveException {
+        if (start == null || !(start.length() == 2) || end == null || !(end.length() == 2)) {
+            return "Invalid move notation, please try again.";
+        }
+        if(!Character.isAlphabetic(start.charAt(0)) || !Character.isDigit(start.charAt(1)) || !Character.isAlphabetic(end.charAt(0)) || !Character.isDigit(end.charAt(1))){
+            return "First character must be a letter and second character must be a digit.";
+        }
+        ChessPosition startPos = new ChessPosition(Character.getNumericValue(start.charAt(1)),start.charAt(0) - 'a' + 1);
+        ChessPosition endPos = new ChessPosition(Character.getNumericValue(end.charAt(1)),end.charAt(0) - 'a' + 1);
+
+        if(promotionPiece != null && game.getBoard().getPiece(startPos).getPieceType() == (ChessPiece.PieceType.PAWN)) {
+            if (ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.ROOK ||
+                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.QUEEN ||
+                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.KNIGHT ||
+                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.BISHOP) {
+                ChessMove move = new ChessMove(startPos, endPos, ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()));
+                game.makeMove(move);
+                drawGame(game, String.valueOf(userColor));
+                return String.format("Promoted from pawn %s to %s %s", start, promotionPiece, end);
+            }
+        }
+        else if(promotionPiece == null){
+            game.makeMove(new ChessMove(startPos, endPos, null));
+            drawGame(game,String.valueOf(userColor));
+            return String.format("Made move %s to %s", start, end);
+        }
+        else{
+            return "Invalid promotion piece.";
+        }
+        return "Only pawns can be promoted.";
     }
 
     private String redraw() {
-        PostLoginClient.drawGame(game, game.getTeamTurn().toString());
+        drawGame(game, game.getTeamTurn().toString());
         return "Redrew current game board.";
     }
 
 
     public String help(){
-        return SET_TEXT_COLOR_BLUE+"move <START> <END> " + SET_TEXT_COLOR_MAGENTA + "- start and end positions\n" +
+        return SET_TEXT_COLOR_BLUE+"move <START> <END> <PROMOTION_PIECE>" + SET_TEXT_COLOR_MAGENTA + "- start and end positions\n" +
                 SET_TEXT_COLOR_BLUE+"redraw " + SET_TEXT_COLOR_MAGENTA + "- chessboard\n" +
                 SET_TEXT_COLOR_BLUE+"leave " + SET_TEXT_COLOR_MAGENTA + "- current game\n" +
                 SET_TEXT_COLOR_BLUE+"resign" + SET_TEXT_COLOR_MAGENTA + "- forfeits game\n" +

@@ -143,7 +143,7 @@ public class PostLoginClient {
             System.out.println();
             ChessGame game = new ChessGame();
             drawGame(game, color.toUpperCase());
-            new InGameClient(facade, ChessGame.TeamColor.valueOf(color.toUpperCase()), game).run();
+            new InGameClient(ChessGame.TeamColor.valueOf(color.toUpperCase()), game).run();
         }
         else{
             return "";
@@ -206,7 +206,7 @@ public class PostLoginClient {
         if(Objects.equals(color, "WHITE")) {
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
-                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", (i - 8) * -1);
+                System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", (i - 8) * -1);
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0) {
                         System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
@@ -218,7 +218,7 @@ public class PostLoginClient {
                                 + RESET_TEXT_COLOR + RESET_BG_COLOR);
                     }
                 }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003",
+                System.out.print(String.format(SET_BG_COLOR_DARK_GREY + " %s\u2003",
                         (i - 8) * -1) + RESET_BG_COLOR + "\n");
             }
             borderRow(whiteList);
@@ -226,7 +226,7 @@ public class PostLoginClient {
         else if(Objects.equals(color, "BLACK")){
             borderRow(blackList);
             for(int i = 0; i < 8; i++) {
-                System.out.printf(SET_BG_COLOR_LIGHT_GREY + "\u2003%s ", i+1);
+                System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", i+1);
                 for (int j = 0; j < 8; j++) {
                     if((i+j) % 2 == 0){
                         System.out.print(SET_BG_COLOR_BLUE + returnPiece(game.getBoard()
@@ -239,7 +239,7 @@ public class PostLoginClient {
                                 + RESET_TEXT_COLOR+RESET_BG_COLOR);
                     }
                 }
-                System.out.print(String.format(SET_BG_COLOR_LIGHT_GREY + " %s\u2003", i+1)
+                System.out.print(String.format(SET_BG_COLOR_DARK_GREY + " %s\u2003", i+1)
                         + RESET_BG_COLOR + "\n");
             }
             borderRow(blackList);
