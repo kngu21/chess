@@ -163,12 +163,12 @@ public class InGameClient {
     }
 
     private String resign() {
-        System.out.print("Are you sure you want to resign? You will forfeit and the game will be over.");
-        System.out.print("Reply 'yes' or 'no'.");
+        System.out.print("Are you sure you want to resign? You will forfeit and the game will be over.\n");
+        System.out.print("Reply 'yes' or 'no'. >>>\n");
         Scanner scanner = new Scanner(System.in);
-        String cased = scanner.toString().toLowerCase();
         String result;
         while(true) {
+            String cased = scanner.nextLine().toLowerCase();
             if (cased.equals("yes")) {
                  result = "You have resigned.";
                  break;

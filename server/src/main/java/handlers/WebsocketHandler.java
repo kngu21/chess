@@ -9,8 +9,6 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import websocket.commands.UserGameCommand;
 
-import java.io.IOException;
-
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -26,7 +24,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx) {
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
-            case CONNECT -> connect();
+            case CONNECT -> connect(ctx, action);
             case MAKE_MOVE -> makeMove();
             case LEAVE -> leave();
             case RESIGN -> resign();
@@ -38,7 +36,9 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    public void connect(){
+    public void connect(WsMessageContext ctx, UserGameCommand cmd){
+        String authToken = cmd.getAuthToken();
+        int gameID = cmd.getGameID();
 
     }
 
