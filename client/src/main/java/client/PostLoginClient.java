@@ -139,11 +139,14 @@ public class PostLoginClient {
             return "invalid color";
         }
         if (facade.joinGame(gameID, color.toUpperCase())) {
-
             System.out.print("Joined game " + gameID + " as " + color);
             System.out.println();
             ChessGame game = new ChessGame();
             drawGame(game, color.toUpperCase());
+            new InGameClient(facade, ChessGame.TeamColor.valueOf(color.toUpperCase()), game).run();
+        }
+        else{
+            return "";
         }
         return "";
     }
@@ -161,12 +164,12 @@ public class PostLoginClient {
     }
 
     public static void borderRow(List<Character> list){
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_DARK_GREY + " \u2003 " + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_LIGHT_GREY + String.format("\u2003%s ",
+            System.out.print(SET_BG_COLOR_DARK_GREY + String.format("\u2003%s ",
                     list.get(i)) + RESET_BG_COLOR);
         }
-        System.out.print(SET_BG_COLOR_LIGHT_GREY + " \u2003 " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_DARK_GREY + " \u2003 " + RESET_BG_COLOR);
         System.out.println();
     }
 

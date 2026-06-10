@@ -66,7 +66,7 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public boolean onBoard(ChessPosition position){
+    public static boolean onBoard(ChessPosition position){
         return position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9;
     }
     public boolean validMove(ChessBoard board, ChessPosition newPosition, ChessPiece piece){
