@@ -132,7 +132,6 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
             gameDAO.replaceGame(gameData);
-
             connections.broadcastAll(new LoadGameMessage(game));
             String msg = username + " made move " + move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
             connections.broadcast(ctx, new NotificationMessage(msg));
@@ -140,11 +139,6 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     (playerColor == ChessGame.TeamColor.WHITE)
                             ? ChessGame.TeamColor.BLACK
                             : ChessGame.TeamColor.WHITE;
-
-            System.out.println("DEBUG username=" + username);
-            System.out.println("DEBUG playerColor=" + playerColor);
-            System.out.println("DEBUG teamTurn=" + game.getTeamTurn());
-
             if (game.isInCheckmate(opponent)) {
                 game.setGameOver();
                 gameDAO.replaceGame(gameData);
@@ -230,8 +224,18 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.send(ctx, new ErrorMessage("Error: game is already over"));
                 return;
             }
-            ChessBoard updated = game.setGameOver();
-            gameDAO.replaceGame(gameData);
+            boolean isWhite = username.equals(gameData.whiteUsername());
+            boolean isBlack = username.equals(gameData.blackUsername());
+
+            if (!isWhite && !isBlack) {
+                connections.send(ctx, new ErrorMessage("Error: observers cannot resign."));
+                return;
+            }
+            ChessGame updated = game.setGameOver();
+            GameData newer = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), updated);
+            gameDAO.replaceGame(newer);
+            GameData check = gameDAO.getGame(gameID);
+            System.out.println("After replace, gameOver = " + check.game().gameOver());
             connections.broadcastAll(new NotificationMessage(username + " resigned"));
             } catch (DataAccessException e) {
                 connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));

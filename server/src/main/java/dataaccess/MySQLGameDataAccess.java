@@ -101,7 +101,7 @@ public class MySQLGameDataAccess implements GameDAO{
                 ps.setString(1, newGame.whiteUsername());
                 ps.setString(2, newGame.blackUsername());
                 ps.setString(3, newGame.gameName());
-                ps.setString(4, new Gson().toJson(newGame));
+                ps.setString(4, new Gson().toJson(newGame.game()));
                 ps.setInt(5, newGame.gameID());
                 ps.executeUpdate();
             }

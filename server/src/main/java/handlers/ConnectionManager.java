@@ -2,25 +2,21 @@ package handlers;
 
 import com.google.gson.Gson;
 import io.javalin.websocket.WsContext;
-import io.javalin.websocket.WsMessageContext;
-import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final Map<WsContext, WsContext> connections = new ConcurrentHashMap<>();
+    public final Map<WsContext, Boolean> connections = new ConcurrentHashMap<>();
     Map<WsContext, Integer> sessionToGame = new ConcurrentHashMap<>();
-    Map< String, WsContext> sessionToAuth = new ConcurrentHashMap<>();
+    Map<WsContext, String> sessionToAuth = new ConcurrentHashMap<>();
 
     public void add(int gameID, String authToken, WsContext ctx) {
-        connections.put(ctx,ctx);
+        connections.put(ctx,true);
         sessionToGame.put(ctx, gameID);
-        sessionToAuth.put(authToken, ctx);
+        sessionToAuth.put(ctx, authToken);
     }
-
 
     public void remove(WsContext ctx) {
         connections.remove(ctx);
@@ -34,22 +30,9 @@ public class ConnectionManager {
         }
     }
 
-    public void sendTo(String authToken, ServerMessage message) throws IOException {
-        WsContext target = null;
-        for(String auth  : sessionToAuth.keySet()){
-            if (auth.equals(authToken)) {
-                target = sessionToAuth.get(auth);
-            }
-            if (target != null && target.session.isOpen()) {
-                target.send(new Gson().toJson(message));
-            }
-        }
-    }
-
-
     public void broadcast(WsContext excludeSession, ServerMessage notification) throws IOException {
         String msg = new Gson().toJson(notification);
-        for (WsContext c : connections.values()) {
+        for (WsContext c : connections.keySet()) {
             if (c.session.isOpen()) {
                 if (!c.equals(excludeSession)) {
                     c.send(msg);
@@ -60,7 +43,7 @@ public class ConnectionManager {
 
     public void broadcastAll(ServerMessage notification) throws IOException {
         String msg = new Gson().toJson(notification);
-        for (WsContext c : connections.values()) {
+        for (WsContext c : connections.keySet()) {
             if (c.session.isOpen()) {
                 c.send(msg);
             }
