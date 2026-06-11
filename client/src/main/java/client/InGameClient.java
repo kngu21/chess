@@ -43,7 +43,7 @@ public class InGameClient implements ServerMessagesHandler {
             }
             case ERROR -> {
                 ErrorMessage error = (ErrorMessage) msg;
-                System.out.println("Error: " + error.getMessage());
+                System.out.println(error.getMessage());
             }
         }
     }
@@ -87,7 +87,11 @@ public class InGameClient implements ServerMessagesHandler {
                     String promo = params.length >= 3 ? params[2] : null;
                     yield move(params[0], params[1], promo);
                 }
-                case "resign" -> resign();
+                case "resign" -> {if (userColor == null) {
+                        yield "Observers cannot resign.";}
+                    ws.resign(authToken, gameID);
+                    yield "success";
+                }
                 case"highlight" -> highlight(params[0]);
                 case "leave" -> leave();
                 default -> "unknown command";
@@ -147,7 +151,7 @@ public class InGameClient implements ServerMessagesHandler {
                         backGround = SET_BG_COLOR_MAGENTA;
                     }
                     else if(isValid && (i+j) % 2 == 0){
-                        backGround = SET_BG_COLOR_LIGHT_GREY;
+                        backGround = SET_BG_COLOR_YELLOW;
                     }
                     else if(isValid && !((i+j) % 2 == 0)){
                         backGround = SET_BG_COLOR_GREEN;
@@ -181,7 +185,7 @@ public class InGameClient implements ServerMessagesHandler {
                         backGround = SET_BG_COLOR_MAGENTA;
                     }
                     else if(isValid && (i+j) % 2 == 0){
-                        backGround = SET_BG_COLOR_LIGHT_GREY;
+                        backGround = SET_BG_COLOR_YELLOW;
                     }
                     else if(isValid && (i+j) % 2 != 0){
                         backGround = SET_BG_COLOR_GREEN;
@@ -228,7 +232,8 @@ public class InGameClient implements ServerMessagesHandler {
         if (start == null || !(start.length() == 2) || end == null || !(end.length() == 2)) {
             return "Invalid move notation, please try again.";
         }
-        if(!Character.isAlphabetic(start.charAt(0)) || !Character.isDigit(start.charAt(1)) || !Character.isAlphabetic(end.charAt(0)) || !Character.isDigit(end.charAt(1))){
+        if(!Character.isAlphabetic(start.charAt(0)) || !Character.isDigit(start.charAt(1)) ||
+                !Character.isAlphabetic(end.charAt(0)) || !Character.isDigit(end.charAt(1))){
             return "First character must be a letter and second character must be a digit.";
         }
         ChessPosition startPos = new ChessPosition(Character.getNumericValue(start.charAt(1)),start.charAt(0) - 'a' + 1);

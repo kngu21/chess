@@ -3,9 +3,11 @@ package client;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import jakarta.websocket.DeploymentException;
 import model.GameInfo;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static ui.EscapeSequences.*;
@@ -134,7 +136,7 @@ public class PostLoginClient {
         }
     }
 
-    public String joinGame(int gameID, String color) throws IOException, InterruptedException {
+    public String joinGame(int gameID, String color) throws IOException, InterruptedException, DeploymentException, URISyntaxException {
         if(!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black")){
             return "invalid color";
         }
@@ -154,7 +156,7 @@ public class PostLoginClient {
         return "";
     }
 
-    public String observeGame(int gameID) throws IOException, InterruptedException {
+    public String observeGame(int gameID) throws IOException, InterruptedException, DeploymentException, URISyntaxException {
         if(facade.observeGame(gameID)){
             System.out.println("Observing game " + gameID);
 

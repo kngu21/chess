@@ -20,8 +20,8 @@ public class WSFacade extends Endpoint{
     Session session;
     ServerMessagesHandler serverMessagesHandler;
 
-    public WSFacade(String url, ServerMessagesHandler serverMessagesHandler) throws IOException {
-        try {
+    public WSFacade(String url, ServerMessagesHandler serverMessagesHandler) throws IOException, DeploymentException, URISyntaxException {
+
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.serverMessagesHandler = serverMessagesHandler;
@@ -50,9 +50,6 @@ public class WSFacade extends Endpoint{
                 }
                 serverMessagesHandler.notify(msg);
             });
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new IOException(ex);
-        }
     }
 
     //Endpoint requires this method, but you don't have to do anything
