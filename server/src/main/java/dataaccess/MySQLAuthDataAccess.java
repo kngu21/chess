@@ -9,17 +9,16 @@ import java.util.UUID;
 
 public class MySQLAuthDataAccess implements AuthDAO{
 
-    private String[] createStatements = {
-            """ 
+    public MySQLAuthDataAccess() throws DataAccessException, SQLException {
+        String[] createStatements = {
+                """ 
               CREATE TABLE IF NOT EXISTS  auths (
               `authToken` varchar(256) NOT NULL,
               `username` varchar(128) NOT NULL,
               PRIMARY KEY (`authToken`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
-    };
-
-    public MySQLAuthDataAccess() throws DataAccessException, SQLException {
+        };
         DatabaseManager.configureDatabase(createStatements);
     }
 
@@ -85,4 +84,5 @@ public class MySQLAuthDataAccess implements AuthDAO{
             throw new DataAccessException("Unable to clear table auths");
         }
     }
+
 }

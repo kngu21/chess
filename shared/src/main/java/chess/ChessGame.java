@@ -36,9 +36,11 @@ public class ChessGame {
         gameIsOver = false;
     }
 
-    public void setGameOver(){
+    public ChessGame setGameOver(){
         gameIsOver = true;
+        return this;
     }
+
     public boolean gameOver(){
         return gameIsOver;
     }
@@ -133,7 +135,7 @@ public class ChessGame {
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
+    public ChessGame makeMove(ChessMove move) throws InvalidMoveException {
         boolean isValid = false;
         ChessPiece piece = myBoard.getPiece(move.getStartPosition());
         if(piece == null) {
@@ -183,6 +185,7 @@ public class ChessGame {
         else{
             setTeamTurn(TeamColor.WHITE);
         }
+        return this;
     }
 
     public ChessPosition setKing(TeamColor color, ChessBoard board){

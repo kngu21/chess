@@ -2,6 +2,7 @@ package handlers;
 
 import com.google.gson.Gson;
 import io.javalin.websocket.WsContext;
+import io.javalin.websocket.WsMessageContext;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -12,12 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final Map<WsContext, WsContext> connections = new ConcurrentHashMap<>();
     Map<WsContext, Integer> sessionToGame = new ConcurrentHashMap<>();
-    Map<WsContext, String> sessionToAuth = new ConcurrentHashMap<>();
+    Map< String, WsContext> sessionToAuth = new ConcurrentHashMap<>();
 
     public void add(int gameID, String authToken, WsContext ctx) {
         connections.put(ctx,ctx);
         sessionToGame.put(ctx, gameID);
-        sessionToAuth.put(ctx, authToken);
+        sessionToAuth.put(authToken, ctx);
     }
 
 
@@ -32,6 +33,19 @@ public class ConnectionManager {
             ctx.send(new Gson().toJson(message));
         }
     }
+
+    public void sendTo(String authToken, ServerMessage message) throws IOException {
+        WsContext target = null;
+        for(String auth  : sessionToAuth.keySet()){
+            if (auth.equals(authToken)) {
+                target = sessionToAuth.get(auth);
+            }
+            if (target != null && target.session.isOpen()) {
+                target.send(new Gson().toJson(message));
+            }
+        }
+    }
+
 
     public void broadcast(WsContext excludeSession, ServerMessage notification) throws IOException {
         String msg = new Gson().toJson(notification);

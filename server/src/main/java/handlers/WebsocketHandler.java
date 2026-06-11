@@ -1,5 +1,6 @@
 package handlers;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
@@ -56,6 +57,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) {
         System.out.println("Websocket closed");
+        connections.remove(ctx);
     }
 
     public void connect(WsMessageContext ctx, UserGameCommand cmd) throws DataAccessException, IOException {
@@ -185,32 +187,54 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 if (isWhite) {
                     updated = new GameData(
                             gameID,
-                            null,                           // white leaves
+                            null,
                             gameData.blackUsername(),
                             gameData.gameName(),
                             gameData.game()
                     );
+                    gameDAO.replaceGame(updated);
                 } else if (isBlack) {
                     updated = new GameData(
                             gameID,
                             gameData.whiteUsername(),
-                            null,                           // black leaves
+                            null,
                             gameData.gameName(),
                             gameData.game()
                     );
-                } else {
-                    // observer leaves — no DB update needed
-                    connections.broadcast(ctx, new NotificationMessage(username + " left the game"));
-                    return;
+                    gameDAO.replaceGame(updated);
                 }
-                gameDAO.replaceGame(updated);
                 connections.broadcast(ctx, new NotificationMessage(username + " left the game"));
+                connections.remove(ctx);
             } catch (DataAccessException e) {
                 connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
             }
     }
 
-    public void resign(WsMessageContext ctx, UserGameCommand cmd){
-
+    public void resign(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+        try {
+            String authToken = cmd.getAuthToken();
+            var auth = authDAO.getAuth(authToken);
+            if (auth == null) {
+                connections.send(ctx, new ErrorMessage("Error: Invalid authToken"));
+                return;
+            }
+            String username = auth.username();
+            int gameID = cmd.getGameID();
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                connections.send(ctx, new ErrorMessage("Error: Game not found."));
+                return;
+            }
+            ChessGame game = gameData.game();
+            if (game.gameOver()) {
+                connections.send(ctx, new ErrorMessage("Error: game is already over"));
+                return;
+            }
+            ChessBoard updated = game.setGameOver();
+            gameDAO.replaceGame(gameData);
+            connections.broadcastAll(new NotificationMessage(username + " resigned"));
+            } catch (DataAccessException e) {
+                connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
+        }
     }
 }
