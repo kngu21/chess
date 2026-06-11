@@ -141,22 +141,30 @@ public class PostLoginClient {
         if (facade.joinGame(gameID, color.toUpperCase())) {
             System.out.print("Joined game " + gameID + " as " + color);
             WSFacade wsFacade = new WSFacade(facade.getServerUrl(), null);
-            drawGame(game, color.toUpperCase());
-            new InGameClient(wsFacade, facade.getAuthToken(), gameID, ChessGame.TeamColor.valueOf(color.toUpperCase())).run();
-        }
-        else{
-            return "";
+            InGameClient inGame = new InGameClient(wsFacade, facade.getAuthToken(), gameID, ChessGame.TeamColor.valueOf(color.toUpperCase()));
+            wsFacade.serverMessagesHandler = inGame;
+            wsFacade.connect(facade.getAuthToken(), gameID);
+            inGame.run();
         }
         return "";
     }
 
     public String observeGame(int gameID) throws IOException, InterruptedException {
         if(facade.observeGame(gameID)){
-            System.out.print("Observing game " + gameID+ "\n");
-            ChessGame game = new ChessGame();
-            drawGame(game, "WHITE");
-        }
-        else {
+            System.out.println("Observing game " + gameID);
+
+            WSFacade ws = new WSFacade(facade.getServerUrl(), null);
+
+            InGameClient inGame = new InGameClient(
+                    ws,
+                    facade.getAuthToken(),
+                    gameID,
+                    null
+            );
+            ws.serverMessagesHandler = inGame;
+            ws.connect(facade.getAuthToken(), gameID);
+            inGame.run();
+        } else {
             return "game not found";
         }
         return "";

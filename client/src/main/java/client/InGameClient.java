@@ -216,7 +216,7 @@ public class InGameClient implements ServerMessagesHandler {
         return result;
     }
 
-    private String move(String start, String end, String promotionPiece) throws InvalidMoveException, IOException {
+    private String move(String start, String end, String promotionPiece) throws IOException {
         if (start == null || !(start.length() == 2) || end == null || !(end.length() == 2)) {
             return "Invalid move notation, please try again.";
         }
@@ -226,26 +226,13 @@ public class InGameClient implements ServerMessagesHandler {
         ChessPosition startPos = new ChessPosition(Character.getNumericValue(start.charAt(1)),start.charAt(0) - 'a' + 1);
         ChessPosition endPos = new ChessPosition(Character.getNumericValue(end.charAt(1)),end.charAt(0) - 'a' + 1);
 
-        if(promotionPiece != null && game.getBoard().getPiece(startPos).getPieceType() == (ChessPiece.PieceType.PAWN)) {
-            if (ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.ROOK ||
-                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.QUEEN ||
-                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.KNIGHT ||
-                    ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.BISHOP) {
-                ChessMove move = new ChessMove(startPos, endPos, ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()));
-                ws.makeMove(authToken, gameID, move);
-                drawGame(game, String.valueOf(userColor));
-                return String.format("Promoted from pawn %s to %s %s", start, promotionPiece, end);
-            }
+        ChessPiece.PieceType promotion = null;
+        if(promotionPiece != null) {
+            promotion = ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase());
         }
-        else if(promotionPiece == null){
-            game.makeMove(new ChessMove(startPos, endPos, null));
-            drawGame(game,String.valueOf(userColor));
-            return String.format("Made move %s to %s", start, end);
-        }
-        else{
-            return "Invalid promotion piece.";
-        }
-        return "Only pawns can be promoted.";
+        ChessMove move = new ChessMove(startPos, endPos, promotion);
+        ws.makeMove(authToken, gameID, move);
+        return "Sent move.";
     }
 
     private String redraw() {
