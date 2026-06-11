@@ -26,7 +26,7 @@ public class Server {
             this.userService = new UserService(user, auth);
             this.gameService = new GameService(game, auth);
             this.voidService = new VoidService(user, auth, game);
-            websocketHandler = new WebsocketHandler(auth, game, user);
+            this.websocketHandler = new WebsocketHandler(auth, game, user);
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }

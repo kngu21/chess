@@ -66,18 +66,18 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.send(ctx, new ErrorMessage("Error: Invalid authToken"));
                 return;
             }
+            connections.add(gameID, authToken, ctx);
             String username = authDAO.getAuth(authToken).username();
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
                 connections.send(ctx, new ErrorMessage("Error: Game not found."));
                 return;
             }
-            connections.add(gameID, authToken, ctx);
             connections.send(ctx, new LoadGameMessage(gameData.game()));
             String role;
-            if (gameData.whiteUsername().equals(username)) {
+            if (username.equals(gameData.whiteUsername())) {
                 role = "WHITE";
-            } else if (gameData.blackUsername().equals(username)) {
+            } else if (username.equals(gameData.blackUsername())) {
                 role = "BLACK";
             } else {
                 role = "OBSERVER";
@@ -108,7 +108,8 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.send(ctx, new ErrorMessage("Error: Game not found."));
                 return;
             }
-            if (gameData.game().gameOver()) {
+            ChessGame game = gameData.game();
+            if (game.gameOver()) {
                 connections.send(ctx, new ErrorMessage("Error: game is already over"));
                 return;
             }
@@ -118,31 +119,19 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.send(ctx, new ErrorMessage("Error: observers cannot make moves."));
                 return;
             }
-            System.out.println("DEBUG username = " + username);
-            System.out.println("DEBUG white = " + gameData.whiteUsername());
-            System.out.println("DEBUG black = " + gameData.blackUsername());
-            System.out.println("DEBUG playerColor = " + playerColor);
-            System.out.println("DEBUG teamTurn = " + gameData.game().getTeamTurn());
-            if (gameData.game().getTeamTurn() != playerColor) {
+            if (game.getTeamTurn() != playerColor) {
                 connections.send(ctx, new ErrorMessage("Error: not your turn"));
                 return;
             }
             try {
-                gameData.game().makeMove(move);
+                game.makeMove(move);
             } catch(InvalidMoveException e){
                 connections.send(ctx, new ErrorMessage("Error: Invalid move."));
                 return;
             }
-            GameData updatedGame = new GameData(
-                    gameData.gameID(),
-                    gameData.whiteUsername(),
-                    gameData.blackUsername(),
-                    gameData.gameName(),
-                    gameData.game()
-            );
+            gameDAO.replaceGame(gameData);
 
-            gameDAO.replaceGame(updatedGame);
-            connections.broadcastAll(new LoadGameMessage(updatedGame.game()));
+            connections.broadcastAll(new LoadGameMessage(game));
             String msg = username + " made move " + move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
             connections.broadcast(ctx, new NotificationMessage(msg));
             ChessGame.TeamColor opponent =
@@ -150,42 +139,75 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                             ? ChessGame.TeamColor.BLACK
                             : ChessGame.TeamColor.WHITE;
 
-            if (updatedGame.game().isInCheckmate(opponent)) {
-                updatedGame.game().setGameOver();
+            System.out.println("DEBUG username=" + username);
+            System.out.println("DEBUG playerColor=" + playerColor);
+            System.out.println("DEBUG teamTurn=" + game.getTeamTurn());
+
+            if (game.isInCheckmate(opponent)) {
+                game.setGameOver();
+                gameDAO.replaceGame(gameData);
                 connections.broadcastAll(new NotificationMessage(username + " wins by checkmate"));
-                GameData newGame = new GameData(
-                        updatedGame.gameID(),
-                        updatedGame.whiteUsername(),
-                        updatedGame.blackUsername(),
-                        updatedGame.gameName(),
-                        updatedGame.game()
-                );
-
-                gameDAO.replaceGame(newGame);
                 return;
-            } else if (updatedGame.game().isInCheck(opponent)) {
-                connections.broadcastAll(new NotificationMessage(opponent + " is in check"));
-            } else if (updatedGame.game().isInStalemate(opponent)) {
-                updatedGame.game().setGameOver();
-                GameData newGame = new GameData(
-                        updatedGame.gameID(),
-                        updatedGame.whiteUsername(),
-                        updatedGame.blackUsername(),
-                        updatedGame.gameName(),
-                        updatedGame.game()
-                );
-
-                gameDAO.replaceGame(newGame);
+            }
+            if (gameData.game().isInStalemate(opponent)) {
+                gameData.game().setGameOver();
+                gameDAO.replaceGame(gameData);
                 connections.broadcastAll(new NotificationMessage(" Game ended in stalemate"));
                 return;
+            }
+            if (gameData.game().isInCheck(opponent)) {
+                connections.broadcastAll(new NotificationMessage(opponent + " is in check"));
             }
         } catch (DataAccessException e){
             connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
         }
     }
 
-    public void leave(WsMessageContext ctx, UserGameCommand cmd){
+    public void leave(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+            try {
+                String authToken = cmd.getAuthToken();
+                var auth = authDAO.getAuth(authToken);
+                if (auth == null) {
+                    connections.send(ctx, new ErrorMessage("Error: Invalid authToken"));
+                    return;
+                }
+                String username = auth.username();
+                int gameID = cmd.getGameID();
 
+                GameData gameData = gameDAO.getGame(gameID);
+                if (gameData == null) {
+                    connections.send(ctx, new ErrorMessage("Error: Game not found."));
+                    return;
+                }
+                boolean isWhite = username.equals(gameData.whiteUsername());
+                boolean isBlack = username.equals(gameData.blackUsername());
+                GameData updated;
+                if (isWhite) {
+                    updated = new GameData(
+                            gameID,
+                            null,                           // white leaves
+                            gameData.blackUsername(),
+                            gameData.gameName(),
+                            gameData.game()
+                    );
+                } else if (isBlack) {
+                    updated = new GameData(
+                            gameID,
+                            gameData.whiteUsername(),
+                            null,                           // black leaves
+                            gameData.gameName(),
+                            gameData.game()
+                    );
+                } else {
+                    // observer leaves — no DB update needed
+                    connections.broadcast(ctx, new NotificationMessage(username + " left the game"));
+                    return;
+                }
+                gameDAO.replaceGame(updated);
+                connections.broadcast(ctx, new NotificationMessage(username + " left the game"));
+            } catch (DataAccessException e) {
+                connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
+            }
     }
 
     public void resign(WsMessageContext ctx, UserGameCommand cmd){
