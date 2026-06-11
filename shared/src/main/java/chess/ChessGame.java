@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame {
     private TeamColor turn;
     private final ChessBoard myBoard;
+    private boolean gameIsOver;
 
     @Override
     public boolean equals(Object o) {
@@ -32,6 +33,14 @@ public class ChessGame {
         this.turn = TeamColor.WHITE;
         this.myBoard = new ChessBoard();
         myBoard.resetBoard();
+        gameIsOver = false;
+    }
+
+    public void setGameOver(){
+        gameIsOver = true;
+    }
+    public boolean gameOver(){
+        return gameIsOver;
     }
 
     /**
