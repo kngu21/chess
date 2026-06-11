@@ -1,6 +1,5 @@
 package handlers;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
@@ -8,7 +7,6 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -29,12 +27,10 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final ConnectionManager connections = new ConnectionManager();
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
-    private final UserDAO userDAO;
 
-    public WebsocketHandler(AuthDAO authDAO, GameDAO gameDAO, UserDAO userDAO) {
+    public WebsocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
-        this.userDAO = userDAO;
     }
 
     @Override
@@ -44,7 +40,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) throws DataAccessException, IOException {
+    public void handleMessage(WsMessageContext ctx) throws IOException {
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(ctx, action);
@@ -60,7 +56,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.remove(ctx);
     }
 
-    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws DataAccessException, IOException {
+    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
         try {
             String authToken = cmd.getAuthToken();
             int gameID = cmd.getGameID();
@@ -85,7 +81,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 role = "OBSERVER";
             }
             String msg = username + " joined as " + role;
-            connections.broadcast(ctx, new NotificationMessage(msg));
+            connections.broadcast(gameID, ctx, new NotificationMessage(msg));
         } catch (DataAccessException e){
             connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
         }
@@ -132,9 +128,9 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
             gameDAO.replaceGame(gameData);
-            connections.broadcastAll(new LoadGameMessage(game));
+            connections.broadcastAll(gameID, new LoadGameMessage(game));
             String msg = username + " made move " + move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
-            connections.broadcast(ctx, new NotificationMessage(msg));
+            connections.broadcast(gameID, ctx, new NotificationMessage(msg));
             ChessGame.TeamColor opponent =
                     (playerColor == ChessGame.TeamColor.WHITE)
                             ? ChessGame.TeamColor.BLACK
@@ -142,17 +138,17 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (game.isInCheckmate(opponent)) {
                 game.setGameOver();
                 gameDAO.replaceGame(gameData);
-                connections.broadcastAll(new NotificationMessage(username + " wins by checkmate"));
+                connections.broadcastAll(gameID, new NotificationMessage(username + " wins by checkmate"));
                 return;
             }
             if (gameData.game().isInStalemate(opponent)) {
                 gameData.game().setGameOver();
                 gameDAO.replaceGame(gameData);
-                connections.broadcastAll(new NotificationMessage(" Game ended in stalemate"));
+                connections.broadcastAll(gameID, new NotificationMessage(" Game ended in stalemate"));
                 return;
             }
             if (gameData.game().isInCheck(opponent)) {
-                connections.broadcastAll(new NotificationMessage(opponent + " is in check"));
+                connections.broadcastAll(gameID, new NotificationMessage(opponent + " is in check"));
             }
         } catch (DataAccessException e){
             connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
@@ -197,7 +193,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     );
                     gameDAO.replaceGame(updated);
                 }
-                connections.broadcast(ctx, new NotificationMessage(username + " left the game"));
+                connections.broadcast(gameID, ctx, new NotificationMessage(username + " left the game"));
                 connections.remove(ctx);
             } catch (DataAccessException e) {
                 connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
@@ -236,7 +232,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             gameDAO.replaceGame(newer);
             GameData check = gameDAO.getGame(gameID);
             System.out.println("After replace, gameOver = " + check.game().gameOver());
-            connections.broadcastAll(new NotificationMessage(username + " resigned"));
+            connections.broadcastAll(gameID, new NotificationMessage(username + " resigned"));
             } catch (DataAccessException e) {
                 connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
         }
