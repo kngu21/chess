@@ -23,6 +23,14 @@ public class ServerFacade {
         return allGames;
     }
 
+    public String getServerUrl(){
+        return serverURL;
+    }
+
+    public String getAuthToken(){
+        return authToken;
+    }
+
     public boolean login(String username, String password) throws IOException, InterruptedException {
         String json = """
                 {

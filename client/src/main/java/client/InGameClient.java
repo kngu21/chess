@@ -1,20 +1,48 @@
 package client;
 
 import chess.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.*;
 
 import static client.PostLoginClient.*;
 import static java.lang.Character.getNumericValue;
 import static ui.EscapeSequences.*;
 
-public class InGameClient {
-    private final ChessGame game;
+public class InGameClient implements ServerMessagesHandler {
+    private final WSFacade ws;
+    private final String authToken;
+    private final int gameID;
     private final ChessGame.TeamColor userColor;
+    private ChessGame game;
 
-    public InGameClient(ChessGame.TeamColor userColor, ChessGame game){
+    public InGameClient(WSFacade ws, String authToken, int gameID, ChessGame.TeamColor userColor) {
+        this.ws = ws;
+        this.authToken = authToken;
+        this.gameID = gameID;
         this.userColor = userColor;
-        this.game = game;
+    }
+
+    public void notify(ServerMessage msg) {
+        switch (msg.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage load = (LoadGameMessage) msg;
+                this.game = load.getGame();
+                drawGame(game, userColor.toString());
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notification = (NotificationMessage) msg;
+                System.out.println(notification.getMessage());
+            }
+            case ERROR -> {
+                ErrorMessage error = (ErrorMessage) msg;
+                System.out.println("Error: " + error.getMessage());
+            }
+        }
     }
 
     public void run(){
@@ -58,12 +86,17 @@ public class InGameClient {
                 }
                 case "resign" -> resign();
                 case"highlight" -> highlight(params[0]);
-                case "leave" -> "leave";
+                case "leave" -> leave();
                 default -> "unknown command";
             };
         } catch (Exception ex) {
             return ex.getMessage();
         }
+    }
+
+    private String leave() throws IOException {
+        ws.leave(authToken, gameID);
+        return "leave";
     }
 
     private String highlight(String position) {
@@ -162,7 +195,7 @@ public class InGameClient {
         }
     }
 
-    private String resign() {
+    private String resign() throws IOException {
         System.out.print("Are you sure you want to resign? You will forfeit and the game will be over.\n");
         System.out.print("Reply 'yes' or 'no'. >>>\n");
         Scanner scanner = new Scanner(System.in);
@@ -170,6 +203,7 @@ public class InGameClient {
         while(true) {
             String cased = scanner.nextLine().toLowerCase();
             if (cased.equals("yes")) {
+                 ws.resign(authToken, gameID);
                  result = "You have resigned.";
                  break;
             } else if (cased.equals("no")) {
@@ -182,7 +216,7 @@ public class InGameClient {
         return result;
     }
 
-    private String move(String start, String end, String promotionPiece) throws InvalidMoveException {
+    private String move(String start, String end, String promotionPiece) throws InvalidMoveException, IOException {
         if (start == null || !(start.length() == 2) || end == null || !(end.length() == 2)) {
             return "Invalid move notation, please try again.";
         }
@@ -198,7 +232,7 @@ public class InGameClient {
                     ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.KNIGHT ||
                     ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()) == ChessPiece.PieceType.BISHOP) {
                 ChessMove move = new ChessMove(startPos, endPos, ChessPiece.PieceType.valueOf(promotionPiece.toUpperCase()));
-                game.makeMove(move);
+                ws.makeMove(authToken, gameID, move);
                 drawGame(game, String.valueOf(userColor));
                 return String.format("Promoted from pawn %s to %s %s", start, promotionPiece, end);
             }

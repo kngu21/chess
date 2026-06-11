@@ -140,10 +140,9 @@ public class PostLoginClient {
         }
         if (facade.joinGame(gameID, color.toUpperCase())) {
             System.out.print("Joined game " + gameID + " as " + color);
-            System.out.println();
-            ChessGame game = new ChessGame();
+            WSFacade wsFacade = new WSFacade(facade.getServerUrl(), null);
             drawGame(game, color.toUpperCase());
-            new InGameClient(ChessGame.TeamColor.valueOf(color.toUpperCase()), game).run();
+            new InGameClient(wsFacade, facade.getAuthToken(), gameID, ChessGame.TeamColor.valueOf(color.toUpperCase())).run();
         }
         else{
             return "";
