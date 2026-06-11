@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import java.io.IOException;
 import websocket.commands.UserGameCommand;
@@ -45,16 +46,18 @@ public class WSFacade extends Endpoint {
         send(new UserGameCommand(
                 UserGameCommand.CommandType.CONNECT,
                 authToken,
-                gameId
+                gameId,
+                null
         ));
     }
 
-    public void makeMove(String authToken, int gameId, Object move) throws IOException {
+    public void makeMove(String authToken, int gameId, ChessMove move) throws IOException {
         // You will extend UserGameCommand to include move data
         send(new UserGameCommand(
                 UserGameCommand.CommandType.MAKE_MOVE,
                 authToken,
-                gameId
+                gameId,
+                move
         ));
     }
 
@@ -81,5 +84,4 @@ public class WSFacade extends Endpoint {
             throw new IOException();
         }
     }
-
 }

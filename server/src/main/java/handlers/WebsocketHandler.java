@@ -1,5 +1,7 @@
 package handlers;
 
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -12,14 +14,12 @@ import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.GameData;
+import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
-
 import java.io.IOException;
-import java.util.Objects;
 
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -46,14 +46,14 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(ctx, action);
-            case MAKE_MOVE -> makeMove();
+            case MAKE_MOVE -> makeMove(ctx, action);
             case LEAVE -> leave();
             case RESIGN -> resign();
         }
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
+    public void handleClose(@NotNull WsCloseContext ctx) {
         System.out.println("Websocket closed");
     }
 
@@ -88,11 +88,35 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    public void makeMove(){
-
+    public void makeMove(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+        try {
+            String authToken = cmd.getAuthToken();
+            String username = authDAO.getAuth(authToken).username();
+            int gameID = cmd.getGameID();
+            if(authDAO.getAuth(authToken) == null){
+                connections.send(ctx, new ErrorMessage("Error: Invalid authToken"));
+                return;
+            }
+            ChessMove move = cmd.getMove();
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                connections.send(ctx, new ErrorMessage("Error: Game not found."));
+                return;
+            }
+            try {
+                gameData.game().makeMove(move);
+            } catch(InvalidMoveException e){
+                connections.send(ctx, new ErrorMessage("Error: Invalid move."));
+            }
+            connections.send(ctx, new LoadGameMessage(gameData.game()));
+            String msg = username + "made move" + ;
+            connections.broadcast(ctx, new NotificationMessage(msg));
+        } catch (DataAccessException e){
+            connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
+        }
     }
 
-    public void leave(){
+    public void leave(WsMessageContext ctx, UserGameCommand cmd){
 
     }
 
