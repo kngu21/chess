@@ -13,6 +13,13 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.GameData;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+
+import java.io.IOException;
+import java.util.Objects;
 
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -35,7 +42,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) throws DataAccessException {
+    public void handleMessage(WsMessageContext ctx) throws DataAccessException, IOException {
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(ctx, action);
@@ -50,12 +57,35 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws DataAccessException {
-        String authToken = cmd.getAuthToken();
-        int gameID = cmd.getGameID();
-        String username = authDAO.getAuth(authToken).username();
-        GameData gameData = gameDAO.getGame(gameID);
-
+    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws DataAccessException, IOException {
+        try {
+            String authToken = cmd.getAuthToken();
+            int gameID = cmd.getGameID();
+            if(authDAO.getAuth(authToken) == null){
+                connections.send(ctx, new ErrorMessage("Error: Invalid authToken"));
+                return;
+            }
+            String username = authDAO.getAuth(authToken).username();
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                connections.send(ctx, new ErrorMessage("Error: Game not found."));
+                return;
+            }
+            connections.add(gameID, authToken, ctx);
+            connections.send(ctx, new LoadGameMessage(gameData.game()));
+            String role;
+            if (gameData.whiteUsername().equals(username)) {
+                role = "WHITE";
+            } else if (gameData.blackUsername().equals(username)) {
+                role = "BLACK";
+            } else {
+                role = "OBSERVER";
+            }
+            String msg = username + " joined as " + role;
+            connections.broadcast(ctx, new NotificationMessage(msg));
+        } catch (DataAccessException e){
+            connections.send(ctx, new ErrorMessage("Server error: " + e.getMessage()));
+        }
     }
 
     public void makeMove(){
