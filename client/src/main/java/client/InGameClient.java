@@ -14,7 +14,7 @@ import static java.lang.Character.getNumericValue;
 import static ui.EscapeSequences.*;
 
 public class InGameClient implements ServerMessagesHandler {
-    private final WSFacade ws;
+    private WSFacade ws;
     private final String authToken;
     private final int gameID;
     private final ChessGame.TeamColor userColor;
@@ -248,5 +248,9 @@ public class InGameClient implements ServerMessagesHandler {
                 SET_TEXT_COLOR_BLUE+"resign" + SET_TEXT_COLOR_MAGENTA + "- forfeits game\n" +
                 SET_TEXT_COLOR_BLUE+"highlight <POSITION> " + SET_TEXT_COLOR_MAGENTA + "- shows legal moves\n" +
                 SET_TEXT_COLOR_BLUE+"help " + SET_TEXT_COLOR_MAGENTA + "- with possible commands\n";
+    }
+
+    public void setWS(WSFacade ws) {
+        this.ws = ws;
     }
 }
