@@ -139,14 +139,14 @@ public class PostLoginClient {
             return "invalid color";
         }
         if (facade.joinGame(gameID, color.toUpperCase())) {
-            System.out.print("Joined game " + gameID + " as " + color);
+            System.out.print("Joined game " + gameID + " as " + color + "\n");
             InGameClient inGame = new InGameClient(
                     null,
                     facade.getAuthToken(),
                     gameID,
-                    null
+                    ChessGame.TeamColor.valueOf(color.toUpperCase())
             );
-            WSFacade wsFacade = new WSFacade(facade.getServerUrl(), null);
+            WSFacade wsFacade = new WSFacade(facade.getServerUrl(), inGame);
             inGame.setWS(wsFacade);
             wsFacade.connect(facade.getAuthToken(), gameID);
             inGame.run();
@@ -215,6 +215,7 @@ public class PostLoginClient {
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
         if(Objects.equals(color, "WHITE")) {
+            System.out.println();
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
                 System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", (i - 8) * -1);
@@ -235,6 +236,7 @@ public class PostLoginClient {
             borderRow(whiteList);
         }
         else if(Objects.equals(color, "BLACK")){
+            System.out.println();
             borderRow(blackList);
             for(int i = 0; i < 8; i++) {
                 System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", i+1);

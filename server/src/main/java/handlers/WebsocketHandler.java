@@ -19,7 +19,6 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import java.io.IOException;
 
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -35,12 +34,11 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
-        System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) throws IOException {
+    public void handleMessage(WsMessageContext ctx){
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(ctx, action);
@@ -52,11 +50,10 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) {
-        System.out.println("Websocket closed");
         connections.remove(ctx);
     }
 
-    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+    public void connect(WsMessageContext ctx, UserGameCommand cmd) {
         try {
             String authToken = cmd.getAuthToken();
             int gameID = cmd.getGameID();
@@ -71,7 +68,9 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.send(ctx, new ErrorMessage("Error: Game not found."));
                 return;
             }
+            System.out.println("About to send LoadGameMessage");
             connections.send(ctx, new LoadGameMessage(gameData.game()));
+            System.out.println("Sent LoadGameMessage");
             String role;
             if (username.equals(gameData.whiteUsername())) {
                 role = "WHITE";
@@ -87,7 +86,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    public void makeMove(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+    public void makeMove(WsMessageContext ctx, UserGameCommand cmd) {
         try {
             String authToken = cmd.getAuthToken();
             if(authDAO.getAuth(authToken) == null){
@@ -155,7 +154,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    public void leave(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+    public void leave(WsMessageContext ctx, UserGameCommand cmd){
             try {
                 String authToken = cmd.getAuthToken();
                 var auth = authDAO.getAuth(authToken);
@@ -200,7 +199,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
     }
 
-    public void resign(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
+    public void resign(WsMessageContext ctx, UserGameCommand cmd){
         try {
             String authToken = cmd.getAuthToken();
             var auth = authDAO.getAuth(authToken);

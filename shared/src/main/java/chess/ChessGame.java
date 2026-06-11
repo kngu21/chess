@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     private TeamColor turn;
-    private final ChessBoard myBoard;
+    private ChessBoard myBoard;
     private boolean gameIsOver;
 
     @Override

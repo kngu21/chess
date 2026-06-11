@@ -3,14 +3,19 @@ package client;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import java.io.IOException;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 import jakarta.websocket.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class WSFacade extends Endpoint {
+public class WSFacade extends Endpoint{
 
     Session session;
     ServerMessagesHandler serverMessagesHandler;
@@ -24,16 +29,29 @@ public class WSFacade extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    serverMessagesHandler.notify(notification);
+            this.session.addMessageHandler(String.class, message -> {
+                JsonObject obj = JsonParser.parseString(message).getAsJsonObject();
+                String type = obj.get("serverMessageType").getAsString();
+                ServerMessage msg;
+                switch (type) {
+                    case "LOAD_GAME" ->
+                            msg = new Gson().fromJson(message, LoadGameMessage.class);
+
+                    case "NOTIFICATION" ->
+                            msg = new Gson().fromJson(message, NotificationMessage.class);
+
+                    case "ERROR" ->
+                            msg = new Gson().fromJson(message, ErrorMessage.class);
+
+                    default -> {
+                        System.out.println("Unknown message type: " + type);
+                        return;
+                    }
                 }
+                serverMessagesHandler.notify(msg);
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new IOException();
+            throw new IOException(ex);
         }
     }
 
@@ -79,7 +97,8 @@ public class WSFacade extends Endpoint {
 
     private void send(UserGameCommand cmd) throws IOException {
         try {
-            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+            String json = new Gson().toJson(cmd);
+            session.getBasicRemote().sendText(json);
         } catch (IOException ex) {
             throw new IOException();
         }

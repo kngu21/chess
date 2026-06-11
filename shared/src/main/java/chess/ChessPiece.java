@@ -11,8 +11,8 @@ import java.util.ArrayList;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
+    private ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType type;
 
     @Override
     public boolean equals(Object o) {

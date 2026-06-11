@@ -32,7 +32,10 @@ public class InGameClient implements ServerMessagesHandler {
             case LOAD_GAME -> {
                 LoadGameMessage load = (LoadGameMessage) msg;
                 this.game = load.getGame();
-                drawGame(game, userColor.toString());
+                String color = (userColor == null)
+                        ? "WHITE"   // observers default to white orientation
+                        : userColor.toString();
+                drawGame(game, color);
             }
             case NOTIFICATION -> {
                 NotificationMessage notification = (NotificationMessage) msg;
@@ -57,7 +60,7 @@ public class InGameClient implements ServerMessagesHandler {
                 result = eval(line);
                 if(result.equals("leave")){
                     System.out.println();
-                    System.exit(0);
+                    break;
                 }
                 System.out.print(result);
             } catch (Throwable e) {
@@ -110,6 +113,9 @@ public class InGameClient implements ServerMessagesHandler {
             int col = position.charAt(0) - 'a' + 1;
             int row = getNumericValue(position.charAt(1));
             ChessPosition start = new ChessPosition(row, col);
+            if(game.getBoard().getPiece(start) == null){
+                drawGame(game, userColor.toString());
+            }
             while (true) {
                 if (!ChessPiece.onBoard(start)) {
                     System.out.print("One or more position is off the chess baord.");
@@ -128,6 +134,7 @@ public class InGameClient implements ServerMessagesHandler {
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
         Collection<ChessMove> valid = game.validMoves(position);
         if(Objects.equals(userColor, ChessGame.TeamColor.WHITE)) {
+            System.out.println();
             borderRow(whiteList);
             for (int i = 0; i < 8; i++) {
                 System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", (i - 8) * -1);
@@ -161,6 +168,7 @@ public class InGameClient implements ServerMessagesHandler {
             borderRow(whiteList);
         }
         else if(Objects.equals(userColor, ChessGame.TeamColor.BLACK)){
+            System.out.println();
             borderRow(blackList);
             for(int i = 0; i < 8; i++) {
                 System.out.printf(SET_BG_COLOR_DARK_GREY + "\u2003%s ", i+1);
@@ -236,7 +244,7 @@ public class InGameClient implements ServerMessagesHandler {
     }
 
     private String redraw() {
-        drawGame(game, game.getTeamTurn().toString());
+        drawGame(game, userColor.toString());
         return "Redrew current game board.";
     }
 

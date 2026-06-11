@@ -16,7 +16,9 @@ public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private String authToken = null;
     private final Gson gson = new Gson();
+
     public ServerFacade(String serverURL){
+        System.out.println("Server url = " + serverURL);
         this.serverURL = serverURL;
     }
     public GameListData getGames(){
