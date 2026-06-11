@@ -1,18 +1,32 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import model.GameData;
 import websocket.commands.UserGameCommand;
 
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+    private final UserDAO userDAO;
+
+    public WebsocketHandler(AuthDAO authDAO, GameDAO gameDAO, UserDAO userDAO) {
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+        this.userDAO = userDAO;
+    }
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -21,7 +35,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) {
+    public void handleMessage(WsMessageContext ctx) throws DataAccessException {
         UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(ctx, action);
@@ -36,9 +50,11 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    public void connect(WsMessageContext ctx, UserGameCommand cmd){
+    public void connect(WsMessageContext ctx, UserGameCommand cmd) throws DataAccessException {
         String authToken = cmd.getAuthToken();
         int gameID = cmd.getGameID();
+        String username = authDAO.getAuth(authToken).username();
+        GameData gameData = gameDAO.getGame(gameID);
 
     }
 
