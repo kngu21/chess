@@ -90,7 +90,7 @@ public class InGameClient implements ServerMessagesHandler {
                 case "resign" -> {if (userColor == null) {
                         yield "Observers cannot resign.";}
                     ws.resign(authToken, gameID);
-                    yield "success";
+                    yield "";
                 }
                 case"highlight" -> highlight(params[0]);
                 case "leave" -> leave();
@@ -137,6 +137,10 @@ public class InGameClient implements ServerMessagesHandler {
         List<Character> whiteList = new ArrayList<>(List.of('a','b','c','d','e','f','g','h'));
         List<Character> blackList = new ArrayList<>(List.of('h','g','f','e','d','c','b','a'));
         Collection<ChessMove> valid = game.validMoves(position);
+        if(game.getBoard().getPiece(position)== null){
+            drawGame(game, userColor.toString());
+            return;
+        }
         if(Objects.equals(userColor, ChessGame.TeamColor.WHITE)) {
             System.out.println();
             borderRow(whiteList);

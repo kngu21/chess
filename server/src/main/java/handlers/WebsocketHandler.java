@@ -128,7 +128,11 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
             gameDAO.replaceGame(gameData);
             connections.broadcastAll(gameID, new LoadGameMessage(game));
-            String msg = username + " made move " + move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
+            String start = "" + (char)('a' + move.getStartPosition().getColumn() - 1)
+                    + move.getStartPosition().getRow();
+            String end = "" + (char)('a' + move.getEndPosition().getColumn() - 1)
+                    + move.getEndPosition().getRow();
+            String msg = username + " made move " + start + " to " + end;
             connections.broadcast(gameID, ctx, new NotificationMessage(msg));
             ChessGame.TeamColor opponent =
                     (playerColor == ChessGame.TeamColor.WHITE)
